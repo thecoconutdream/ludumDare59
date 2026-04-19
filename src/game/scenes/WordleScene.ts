@@ -70,7 +70,7 @@ export class WordleScene implements Scene {
   render(ctx: CanvasRenderingContext2D): void {
     const bgKey = `bg_client_surface_${gameState.clientVariant}`
     if (this.assets.hasImage(bgKey)) {
-      ctx.drawImage(this.assets.getImage(bgKey), 0, 0)
+      ctx.drawImage(this.assets.getImage(bgKey), 0, 0, GAME_WIDTH, GAME_HEIGHT)
     } else {
       ctx.fillStyle = '#1a1025'
       ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)

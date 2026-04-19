@@ -14,6 +14,10 @@ import { WordleScene } from '@game/scenes/WordleScene'
 import { SidePlanetScene } from '@game/scenes/SidePlanetScene'
 import { GameOverScene } from '@game/scenes/GameOverScene'
 
+const CAMERA_BASE_WIDTH = 320
+const CAMERA_BASE_HEIGHT = 180
+const CAMERA_DISTANCE = 1
+
 export class SpaceFlightScene implements Scene {
   private ship = new Ship()
   private camera = new Camera()
@@ -39,6 +43,7 @@ export class SpaceFlightScene implements Scene {
   onEnter(): void {
     this.ship.pos = new Vector2(50, 0)
     this.camera.position = this.ship.pos.clone()
+    this.updateCameraZoom()
   }
 
   onResume(): void {
@@ -48,6 +53,8 @@ export class SpaceFlightScene implements Scene {
   onExit(): void {}
 
   update(dt: number): void {
+    this.updateCameraZoom()
+
     if (this.screenShake > 0) this.screenShake = Math.max(0, this.screenShake - dt * 5)
     if (this.interactionCooldown > 0) this.interactionCooldown -= dt
 
@@ -98,6 +105,14 @@ export class SpaceFlightScene implements Scene {
         }
       }
     }
+  }
+
+  private updateCameraZoom(): void {
+    const resolutionScale = Math.min(
+      GAME_WIDTH / CAMERA_BASE_WIDTH,
+      GAME_HEIGHT / CAMERA_BASE_HEIGHT,
+    )
+    this.camera.zoom = resolutionScale / CAMERA_DISTANCE
   }
 
   render(ctx: CanvasRenderingContext2D): void {

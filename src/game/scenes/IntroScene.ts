@@ -14,6 +14,9 @@ interface IntroPhase {
 }
 
 export class IntroScene implements Scene {
+  private static readonly BASE_W = 320
+  private static readonly BASE_H = 180
+
   private phaseIndex = 0
   private phaseTimer = 0
   private fadeAlpha = 0
@@ -75,6 +78,11 @@ export class IntroScene implements Scene {
       return
     }
 
+    if (this.input.isPressed('confirm')) {
+      this.advancePhase()
+      return
+    }
+
     this.phaseTimer += dt
 
     // Liftoff shake on last phase
@@ -85,11 +93,7 @@ export class IntroScene implements Scene {
     }
 
     if (this.phaseTimer >= this.phases[this.phaseIndex].duration) {
-      this.phaseIndex++
-      this.phaseTimer = 0
-      if (this.phaseIndex >= this.phases.length) {
-        this.launch()
-      }
+      this.advancePhase()
     }
   }
 
@@ -101,7 +105,7 @@ export class IntroScene implements Scene {
 
     // Background
     if (this.assets.hasImage(phase.bgKey)) {
-      ctx.drawImage(this.assets.getImage(phase.bgKey), 0, 0)
+      ctx.drawImage(this.assets.getImage(phase.bgKey), 0, 0, GAME_WIDTH, GAME_HEIGHT)
     } else {
       ctx.fillStyle = phase.bgKey.includes('exterior') ? '#1a0a2a' : '#2a1500'
       ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
@@ -161,12 +165,25 @@ export class IntroScene implements Scene {
     this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets))
   }
 
+  private advancePhase(): void {
+    this.phaseIndex++
+    this.phaseTimer = 0
+    if (this.phaseIndex >= this.phases.length) {
+      this.launch()
+    }
+  }
+
   private drawPizzeriaInterior(ctx: CanvasRenderingContext2D): void {
+    const sx = GAME_WIDTH / IntroScene.BASE_W
+    const sy = GAME_HEIGHT / IntroScene.BASE_H
+    ctx.save()
+    ctx.scale(sx, sy)
+
     // Floor
     ctx.fillStyle = '#332211'
-    ctx.fillRect(0, 130, GAME_WIDTH, 50)
+    ctx.fillRect(0, 130, IntroScene.BASE_W, 50)
     // Checkered
-    for (let x = 0; x < GAME_WIDTH; x += 20) {
+    for (let x = 0; x < IntroScene.BASE_W; x += 20) {
       for (let y = 130; y < 180; y += 20) {
         if (((x / 20) + (y / 20)) % 2 === 0) {
           ctx.fillStyle = '#3d2a15'
@@ -204,15 +221,22 @@ export class IntroScene implements Scene {
     ctx.fillRect(154, 48, 12, 14)
     ctx.fillStyle = '#ff6600'
     ctx.fillRect(152, 44, 16, 6)
+
+    ctx.restore()
   }
 
   private drawPizzeriaExterior(ctx: CanvasRenderingContext2D): void {
+    const sx = GAME_WIDTH / IntroScene.BASE_W
+    const sy = GAME_HEIGHT / IntroScene.BASE_H
+    ctx.save()
+    ctx.scale(sx, sy)
+
     // Alien sky
     ctx.fillStyle = '#0a0028'
-    ctx.fillRect(0, 0, GAME_WIDTH, 110)
+    ctx.fillRect(0, 0, IntroScene.BASE_W, 110)
     // Ground
     ctx.fillStyle = '#1a1a2a'
-    ctx.fillRect(0, 110, GAME_WIDTH, 70)
+    ctx.fillRect(0, 110, IntroScene.BASE_W, 70)
     // Pizzeria building
     ctx.fillStyle = '#2a1a0a'
     ctx.fillRect(10, 50, 100, 70)
@@ -245,5 +269,7 @@ export class IntroScene implements Scene {
     ctx.fillStyle = '#ffffff'
     const stars = [[30,20],[80,15],[130,30],[180,10],[250,25],[300,18],[50,40],[170,50],[280,40]]
     for (const [x,y] of stars) ctx.fillRect(x, y, 1, 1)
+
+    ctx.restore()
   }
 }

@@ -40,6 +40,13 @@ export class CharacterSelectScene implements Scene {
     ctx.fillStyle = '#0a0a1a'
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
+    const cardW = Math.min(140, Math.floor(GAME_WIDTH * 0.28))
+    const cardH = Math.min(150, Math.floor(GAME_HEIGHT * 0.62))
+    const cardY = Math.floor(GAME_HEIGHT * 0.22)
+    const gap = Math.max(16, Math.floor(GAME_WIDTH * 0.05))
+    const totalW = CHARACTERS.length * cardW + (CHARACTERS.length - 1) * gap
+    const startX = Math.floor((GAME_WIDTH - totalW) / 2)
+
     ctx.fillStyle = '#ffffff'
     ctx.font = FONT_SM
     ctx.textAlign = 'center'
@@ -52,18 +59,17 @@ export class CharacterSelectScene implements Scene {
     for (let i = 0; i < CHARACTERS.length; i++) {
       const ch = CHARACTERS[i]
       const isSelected = i === this.selected
-      const cx = i === 0 ? GAME_WIDTH / 4 : (GAME_WIDTH / 4) * 3
-      const cardX = cx - 50
-      const cardY = 45
+      const cardX = startX + i * (cardW + gap)
+      const cx = cardX + cardW / 2
 
       // Card background
       ctx.fillStyle = isSelected ? ch.color + '33' : '#11111f'
-      ctx.fillRect(cardX, cardY, 100, 110)
+      ctx.fillRect(cardX, cardY, cardW, cardH)
 
       // Border
       ctx.strokeStyle = isSelected ? ch.color : '#334455'
       ctx.lineWidth = isSelected ? 2 : 1
-      ctx.strokeRect(cardX, cardY, 100, 110)
+      ctx.strokeRect(cardX, cardY, cardW, cardH)
 
       // Character sprite placeholder
       ctx.fillStyle = ch.color + (isSelected ? 'cc' : '55')
@@ -89,7 +95,7 @@ export class CharacterSelectScene implements Scene {
       // Selected indicator
       if (isSelected && Math.sin(this.blink * 4) > 0) {
         ctx.fillStyle = ch.color
-        ctx.fillText('^', cx, cardY + 108)
+        ctx.fillText('^', cx, cardY + cardH - 8)
       }
     }
 
