@@ -56,6 +56,12 @@ export class Ship {
     this.anim.play(PlayerAnims.hit)
   }
 
+  resetState(): void {
+    this.state = 'fly'
+    this.vel = Vector2.zero()
+    this.anim.play(PlayerAnims.fly)
+  }
+
   update(dt: number, input: InputManager, maxSpeed: number): void {
     if (this.state === 'fly') {
       if (input.isHeld('left'))  this.angle -= this.turnSpeed * dt

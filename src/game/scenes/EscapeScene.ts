@@ -37,6 +37,7 @@ export class EscapeScene implements Scene {
   private resultTimer = 0
   private screenShake = 0
   private graceTimer = GRACE_PERIOD
+  private invincibilityTimer = 0
 
   // Ship physics
   private readonly THRUST = 260
@@ -70,6 +71,7 @@ export class EscapeScene implements Scene {
 
   update(dt: number): void {
     if (this.screenShake > 0) this.screenShake -= dt * 6
+    if (this.invincibilityTimer > 0) this.invincibilityTimer -= dt
 
     if (this.hit || this.escaped) {
       this.resultTimer += dt
@@ -134,16 +136,25 @@ export class EscapeScene implements Scene {
 
     // Hit detection
     const shipBounds = new AABB(this.shipPos.x - 6, this.shipPos.y - 5, 12, 10)
-    for (const p of this.projectiles) {
-      if (shipBounds.contains(p.pos)) {
-        if (gameState.upgrades.shield) {
-          gameState.upgrades.shield = false
-          this.projectiles = this.projectiles.filter(q => q !== p)
-          this.screenShake = 1
-        } else {
-          this.hit = true
-          this.resultTimer = 0
-          return
+    if (this.invincibilityTimer <= 0) {
+      for (const p of this.projectiles) {
+        if (shipBounds.contains(p.pos)) {
+          if (gameState.upgrades.shield) {
+            gameState.upgrades.shield = false
+            this.projectiles = this.projectiles.filter(q => q !== p)
+            this.screenShake = 1
+          } else {
+            gameState.lives--
+            if (gameState.lives <= 0) {
+              this.hit = true
+              this.resultTimer = 0
+              return
+            }
+            this.projectiles = this.projectiles.filter(q => q !== p)
+            this.screenShake = 1
+            this.invincibilityTimer = 2
+          }
+          break
         }
       }
     }
@@ -263,5 +274,24 @@ export class EscapeScene implements Scene {
       ctx.font = FONT_SM
       ctx.fillText('DIRECT HIT!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
     }
+
+    this.renderLives(ctx)
+  }
+
+  private renderLives(ctx: CanvasRenderingContext2D): void {
+    const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
+    const img = this.assets.getImage(charKey)
+    const iconW = 10, iconH = 15
+    const gap = 4
+    const total = 3 * iconW + 2 * gap
+    const startX = Math.floor(GAME_WIDTH / 2 - total / 2)
+    const blink = this.invincibilityTimer > 0 && Math.floor(Date.now() / 120) % 2 === 0
+
+    for (let i = 0; i < 3; i++) {
+      const x = startX + i * (iconW + gap)
+      ctx.globalAlpha = i < gameState.lives ? (blink ? 0.3 : 1) : 0.2
+      ctx.drawImage(img, 0, 0, 32, 48, x, 36, iconW, iconH)
+    }
+    ctx.globalAlpha = 1
   }
 }

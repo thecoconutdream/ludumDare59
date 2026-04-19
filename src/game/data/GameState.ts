@@ -6,6 +6,7 @@ export type UpgradeType = 'hyperdrive' | 'thruster_damaged' | 'shield' | 'nav_ch
 class GameState {
   character: CharacterType = 'cat'
   deliveryCount = 0
+  lives = 3
   unlockedOutfits: string[] = []
   visitedSidePlanets = new Set<string>()
 
@@ -23,6 +24,7 @@ class GameState {
 
   resetRun(): void {
     this.deliveryCount = 0
+    this.lives = 3
     this.unlockedOutfits = []
     this.visitedSidePlanets.clear()
     this.upgrades = { hyperdrive: false, thrusterDamaged: false, shield: false, navChip: false }

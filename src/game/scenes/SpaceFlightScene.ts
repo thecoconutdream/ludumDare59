@@ -27,6 +27,7 @@ export class SpaceFlightScene implements Scene {
   private screenShake = 0
   private interactionCooldown = 0
   private hitTimer = 0
+  private invincibilityTimer = 0
 
   constructor(
     private scenes: SceneManager,
@@ -55,12 +56,19 @@ export class SpaceFlightScene implements Scene {
     if (this.screenShake > 0) this.screenShake = Math.max(0, this.screenShake - dt * 5)
     if (this.interactionCooldown > 0) this.interactionCooldown -= dt
 
+    if (this.invincibilityTimer > 0) this.invincibilityTimer -= dt
+
     if (this.hitTimer > 0) {
       this.hitTimer -= dt
       this.ship.update(dt, this.input, gameState.maxSpeed)
       this.camera.follow(this.ship.pos, 0.08)
       if (this.hitTimer <= 0) {
-        this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets))
+        if (gameState.lives <= 0) {
+          this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets))
+        } else {
+          this.ship.resetState()
+          this.invincibilityTimer = 2.5
+        }
       }
       return
     }
@@ -76,13 +84,14 @@ export class SpaceFlightScene implements Scene {
     }
     this.asteroids.update(dt, this.ship.pos)
 
-    const hit = this.asteroids.checkCollision(this.ship.bounds)
+    const hit = this.invincibilityTimer <= 0 ? this.asteroids.checkCollision(this.ship.bounds) : null
     if (hit) {
       if (gameState.upgrades.shield) {
         gameState.upgrades.shield = false
         this.asteroids.remove(hit)
         this.screenShake = 1
       } else {
+        gameState.lives--
         this.ship.triggerHit()
         this.screenShake = 1.5
         this.hitTimer = 0.9
@@ -173,6 +182,8 @@ export class SpaceFlightScene implements Scene {
       ctx.fillText(`ETA ${eta}s`, GAME_WIDTH - 4, cy + 22)
     }
 
+    this.renderLives(ctx)
+
     ctx.textAlign = 'left'
     ctx.fillStyle = '#ffcc00'
     ctx.fillText(`DELIVERY #${gameState.deliveryCount + 1}`, 4, 10)
@@ -198,5 +209,22 @@ export class SpaceFlightScene implements Scene {
         ctx.fillText('(explored)', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       }
     }
+  }
+
+  private renderLives(ctx: CanvasRenderingContext2D): void {
+    const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
+    const img = this.assets.getImage(charKey)
+    const iconW = 10, iconH = 15
+    const gap = 4
+    const total = 3 * iconW + 2 * gap
+    const startX = Math.floor(GAME_WIDTH / 2 - total / 2)
+    const blink = this.invincibilityTimer > 0 && Math.floor(Date.now() / 120) % 2 === 0
+
+    for (let i = 0; i < 3; i++) {
+      const x = startX + i * (iconW + gap)
+      ctx.globalAlpha = i < gameState.lives ? (blink ? 0.3 : 1) : 0.2
+      ctx.drawImage(img, 0, 0, 32, 48, x, 2, iconW, iconH)
+    }
+    ctx.globalAlpha = 1
   }
 }
