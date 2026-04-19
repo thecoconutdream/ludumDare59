@@ -48,7 +48,7 @@ export class CharacterSelectScene implements Scene {
 
     ctx.fillStyle = '#556677'
     ctx.font = FONT_SM
-    ctx.fillText('< > PICK   ENTER GO', GAME_WIDTH / 2, 34)
+    ctx.fillText('< > : PICK   ENTR : GO', GAME_WIDTH / 2, 34)
 
     for (let i = 0; i < CHARACTERS.length; i++) {
       const ch = CHARACTERS[i]
@@ -100,7 +100,7 @@ export class CharacterSelectScene implements Scene {
       ctx.fillStyle = '#ffcc00'
       ctx.font = FONT_SM
       ctx.textAlign = 'center'
-      ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, GAME_HEIGHT - 10)
+      ctx.fillText('PRESS ENTR', GAME_WIDTH / 2, GAME_HEIGHT - 10)
     }
   }
 }

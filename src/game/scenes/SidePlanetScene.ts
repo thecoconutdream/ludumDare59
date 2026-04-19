@@ -158,7 +158,7 @@ export class SidePlanetScene implements Scene {
     if (Math.sin(this.blink * 4) > 0) {
       ctx.fillStyle = '#aaaacc'
       ctx.font = FONT_SM
-      ctx.fillText('PRESS ENTER to leave', cx, py + 56)
+      ctx.fillText('PRESS ENTR to leave', cx, py + 56)
     }
   }
 

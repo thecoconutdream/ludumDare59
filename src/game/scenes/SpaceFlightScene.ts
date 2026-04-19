@@ -217,7 +217,7 @@ export class SpaceFlightScene implements Scene {
       ctx.textAlign = 'center'
       if (this.nearbyPlanet.type === 'client') {
         ctx.fillStyle = '#ffcc00'
-        ctx.fillText('[ENTER] APPROACH', GAME_WIDTH / 2, GAME_HEIGHT - 10)
+        ctx.fillText('[ENTR] APPROACH', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       } else if (this.nearbyPlanet.type === 'side' && !isVisited) {
         ctx.fillStyle = '#44aaff'
         ctx.fillText('[E] LAND', GAME_WIDTH / 2, GAME_HEIGHT - 10)

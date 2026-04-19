@@ -213,7 +213,7 @@ export class WordleScene implements Scene {
 
     if (key === 'Backspace' || key === '<') {
       this.currentInput = this.currentInput.slice(0, -1)
-    } else if (key === 'Enter' || key === 'OK') {
+    } else if (key === 'ENTR' || key === 'OK') {
       this.submit()
     } else if (/^[A-Za-z]$/.test(key) && this.currentInput.length < WORD_LENGTH) {
       this.currentInput += key.toUpperCase()

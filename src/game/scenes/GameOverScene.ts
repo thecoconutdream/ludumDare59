@@ -46,7 +46,7 @@ export class GameOverScene implements Scene {
 
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffffff'
-      ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, 140)
+      ctx.fillText('PRESS ENTR', GAME_WIDTH / 2, 140)
     }
   }
 }

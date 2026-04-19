@@ -102,7 +102,7 @@ export class SuccessScene implements Scene {
 
     ctx.fillStyle = '#666688'
     ctx.font = FONT_SM
-    ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, GAME_HEIGHT - 10)
+    ctx.fillText('PRESS ENTR', GAME_WIDTH / 2, GAME_HEIGHT - 10)
   }
 
   private spawnParticles(): void {

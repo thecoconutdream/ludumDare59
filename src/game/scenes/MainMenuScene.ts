@@ -67,7 +67,7 @@ export class MainMenuScene implements Scene {
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffcc00'
       ctx.font = FONT_SM
-      ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, 128)
+      ctx.fillText('PRESS ENTR', GAME_WIDTH / 2, 128)
     }
 
     ctx.fillStyle = '#334455'
