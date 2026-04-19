@@ -160,7 +160,7 @@ export class EscapeScene implements Scene {
     // Background
     const bgKey = `bg_client_surface_${gameState.clientVariant}`
     if (this.assets.hasImage(bgKey)) {
-      ctx.drawImage(this.assets.getImage(bgKey), 0, 0, GAME_WIDTH, GAME_HEIGHT)
+      ctx.drawImage(this.assets.getImage(bgKey), 0, 0)
     } else {
       ctx.fillStyle = '#200a0a'
       ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
