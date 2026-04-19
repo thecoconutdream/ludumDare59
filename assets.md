@@ -1,4 +1,4 @@
-# Asset List — Space Pizza Delivery
+ö# Asset List — Space Pizza Delivery
 
 Game resolution: **320×180px** · Style: **pixel art** · All sprites as PNG
 

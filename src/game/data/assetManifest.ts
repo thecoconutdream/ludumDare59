@@ -107,6 +107,12 @@ export const assetManifest: AssetDef[] = [
 
   // ─── Planets ───────────────────────────────────────────────────────────────
   {
+    key: 'planet_home_title',
+    path: 'sprites/planets/planet_home_title.png',
+    width: 96, height: 110,
+    placeholderColor: C.planet, label: 'HOME TITLE',
+  },
+  {
     key: 'planet_home',
     path: 'sprites/planets/planet_home.png',
     width: 48, height: 48,
@@ -197,22 +203,16 @@ export const assetManifest: AssetDef[] = [
     placeholderColor: '#ff4400', label: 'LVA 2',
   },
   {
-    key: 'planet_dead_1',
-    path: 'sprites/planets/planet_dead_1.png',
-    width: 32, height: 32,
+    key: 'planet_side_dead_1',
+    path: 'sprites/planets/planet_side_dead_1.png',
+    width: 40, height: 40,
     placeholderColor: '#666666', label: 'DEAD 1',
   },
   {
-    key: 'planet_dead_2',
-    path: 'sprites/planets/planet_dead_2.png',
-    width: 32, height: 32,
+    key: 'planet_side_dead_2',
+    path: 'sprites/planets/planet_side_dead_2.png',
+    width: 40, height: 40,
     placeholderColor: '#666666', label: 'DEAD 2',
-  },
-  {
-    key: 'planet_dead_3',
-    path: 'sprites/planets/planet_dead_3.png',
-    width: 32, height: 32,
-    placeholderColor: '#666666', label: 'DEAD 3',
   },
 
   // ─── Space Parallax Backgrounds ────────────────────────────────────────────
@@ -351,19 +351,19 @@ export const assetManifest: AssetDef[] = [
   {
     key: 'junk_satellite',
     path: 'sprites/obstacles/junk_satellite.png',
-    width: 72, height: 12, frameWidth: 12, frameHeight: 12,
+    width: 12, height: 12,
     placeholderColor: C.obstacle, label: 'SAT',
   },
   {
     key: 'junk_panel',
     path: 'sprites/obstacles/junk_panel.png',
-    width: 72, height: 12, frameWidth: 12, frameHeight: 12,
+    width: 12, height: 12,
     placeholderColor: C.obstacle, label: 'PNL',
   },
   {
     key: 'junk_canister',
     path: 'sprites/obstacles/junk_canister.png',
-    width: 72, height: 12, frameWidth: 12, frameHeight: 12,
+    width: 12, height: 12,
     placeholderColor: C.obstacle, label: 'CAN',
   },
 

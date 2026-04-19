@@ -40,13 +40,12 @@ export class Planet {
     if (this.type === 'home')   return 'planet_home'
     if (this.type === 'client') return `planet_client_${this.variant}`
     if (this.type === 'side')   return `planet_side_${this.biome}_${this.variant}`
-    return `planet_dead_${this.variant}`
+    return `planet_side_dead_${this.variant}`
   }
 
   private spriteSize(): number {
     if (this.type === 'home' || this.type === 'client') return 48
-    if (this.type === 'side') return 40
-    return 32
+    return 40
   }
 
   render(ctx: CanvasRenderingContext2D, camera: Camera, assets: AssetLoader, visited: boolean): void {
@@ -117,7 +116,7 @@ export class Planet {
       planets.push(new Planet(
         `dead_${i}`,
         base.add(new Vector2(Math.cos(a) * (150 + i * 80), Math.sin(a) * (150 + i * 80))),
-        'dead', 14, PLANET_COLORS.dead, '', (i % 3) + 1,
+        'dead', 14, PLANET_COLORS.dead, '', (i % 2) + 1,
       ))
     }
 

@@ -1,6 +1,7 @@
 import { Vector2 } from '@engine/physics/Vector2'
 import { AABB } from '@engine/physics/AABB'
 import { Camera } from '@engine/rendering/Camera'
+import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 
 export interface AsteroidData {
@@ -16,17 +17,19 @@ const VARIANT_RADII: Record<string, number> = {
   asteroid_small_1: 4, asteroid_small_2: 4, asteroid_small_3: 4,
   asteroid_medium_1: 8, asteroid_medium_2: 8, asteroid_medium_3: 8,
   asteroid_large_1: 14, asteroid_large_2: 14,
-  asteroid_huge_1: 28, asteroid_huge_2: 36,
+  asteroid_huge: 16,
+  junk_satellite: 6, junk_panel: 6, junk_canister: 6,
 }
 
-// Weighted: smalls appear often, huge ones rarely
+// Weighted: smalls appear often, huge ones rarely, junk occasionally
 const VARIANT_POOL = [
   'asteroid_small_1', 'asteroid_small_2', 'asteroid_small_3',
   'asteroid_small_1', 'asteroid_small_2',
   'asteroid_medium_1', 'asteroid_medium_2', 'asteroid_medium_3',
   'asteroid_medium_1', 'asteroid_medium_2',
   'asteroid_large_1', 'asteroid_large_2',
-  'asteroid_huge_1', 'asteroid_huge_2',
+  'asteroid_huge',
+  'junk_satellite', 'junk_panel', 'junk_canister',
 ]
 
 export class AsteroidSystem {
@@ -89,29 +92,19 @@ export class AsteroidSystem {
     this.asteroids = this.asteroids.filter(a => a !== asteroid)
   }
 
-  render(ctx: CanvasRenderingContext2D, camera: Camera): void {
+  render(ctx: CanvasRenderingContext2D, camera: Camera, assets: AssetLoader): void {
     for (const a of this.asteroids) {
       const s = camera.worldToScreen(a.pos)
       if (s.x < -100 || s.x > GAME_WIDTH + 100 || s.y < -100 || s.y > GAME_HEIGHT + 100) continue
 
+      const img = assets.getImage(a.variantKey)
+      const hw = img.width / 2
+      const hh = img.height / 2
+
       ctx.save()
       ctx.translate(s.x, s.y)
       ctx.rotate(a.rotation)
-      ctx.fillStyle = '#776655'
-      ctx.strokeStyle = '#998877'
-      ctx.lineWidth = 1
-      const r = a.radius
-      ctx.beginPath()
-      ctx.moveTo(r, 0)
-      ctx.lineTo(r * 0.5, -r)
-      ctx.lineTo(-r * 0.7, -r * 0.8)
-      ctx.lineTo(-r, -r * 0.3)
-      ctx.lineTo(-r * 0.8, r * 0.6)
-      ctx.lineTo(-r * 0.2, r)
-      ctx.lineTo(r * 0.6, r * 0.7)
-      ctx.closePath()
-      ctx.fill()
-      ctx.stroke()
+      ctx.drawImage(img, -hw, -hh)
       ctx.restore()
     }
   }

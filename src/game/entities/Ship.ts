@@ -18,7 +18,7 @@ const INITIAL_STATS = {
 
 // Ship sprite: 64×48px. Colored anchor line at y=32, x-center=32.
 const SHIP_W = 64, SHIP_H = 48
-const ANCHOR_X = 32, ANCHOR_Y = 32
+const ANCHOR_X = 35, ANCHOR_Y = 32
 
 // Player drawn at 50% scale (32×48 → 16×24)
 const PLAYER_W = 32, PLAYER_H = 48

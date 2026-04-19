@@ -40,16 +40,8 @@ export class MainMenuScene implements Scene {
     ctx.fillStyle = '#ffffff'
     for (const s of this.stars) ctx.fillRect(s.x, s.y, s.s, s.s)
 
-    // Pizza planet decoration
-    ctx.fillStyle = '#ff6b3533'
-    ctx.beginPath()
-    ctx.arc(260, 140, 50, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.strokeStyle = '#ff6b3566'
-    ctx.lineWidth = 1
-    ctx.beginPath()
-    ctx.arc(260, 140, 50, 0, Math.PI * 2)
-    ctx.stroke()
+    // Pizza planet
+    ctx.drawImage(this.assets.getImage('planet_home_title'), 212, 70)
 
     // Title
     ctx.textAlign = 'center'
