@@ -351,19 +351,19 @@ export const assetManifest: AssetDef[] = [
   {
     key: 'junk_satellite',
     path: 'sprites/obstacles/junk_satellite.png',
-    width: 72, height: 12, frameWidth: 12, frameHeight: 12,
+    width: 12, height: 12,
     placeholderColor: C.obstacle, label: 'SAT',
   },
   {
     key: 'junk_panel',
     path: 'sprites/obstacles/junk_panel.png',
-    width: 72, height: 12, frameWidth: 12, frameHeight: 12,
+    width: 12, height: 12,
     placeholderColor: C.obstacle, label: 'PNL',
   },
   {
     key: 'junk_canister',
     path: 'sprites/obstacles/junk_canister.png',
-    width: 72, height: 12, frameWidth: 12, frameHeight: 12,
+    width: 12, height: 12,
     placeholderColor: C.obstacle, label: 'CAN',
   },
 

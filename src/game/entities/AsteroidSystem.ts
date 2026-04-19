@@ -18,9 +18,10 @@ const VARIANT_RADII: Record<string, number> = {
   asteroid_medium_1: 8, asteroid_medium_2: 8, asteroid_medium_3: 8,
   asteroid_large_1: 14, asteroid_large_2: 14,
   asteroid_huge: 16,
+  junk_satellite: 6, junk_panel: 6, junk_canister: 6,
 }
 
-// Weighted: smalls appear often, huge ones rarely
+// Weighted: smalls appear often, huge ones rarely, junk occasionally
 const VARIANT_POOL = [
   'asteroid_small_1', 'asteroid_small_2', 'asteroid_small_3',
   'asteroid_small_1', 'asteroid_small_2',
@@ -28,6 +29,7 @@ const VARIANT_POOL = [
   'asteroid_medium_1', 'asteroid_medium_2',
   'asteroid_large_1', 'asteroid_large_2',
   'asteroid_huge',
+  'junk_satellite', 'junk_panel', 'junk_canister',
 ]
 
 export class AsteroidSystem {
