@@ -13,12 +13,14 @@ export interface AsteroidData {
   variantKey: string
 }
 
+const SPRITE_SCALE = 2
+
 const VARIANT_RADII: Record<string, number> = {
-  asteroid_small_1: 4, asteroid_small_2: 4, asteroid_small_3: 4,
-  asteroid_medium_1: 8, asteroid_medium_2: 8, asteroid_medium_3: 8,
-  asteroid_large_1: 14, asteroid_large_2: 14,
-  asteroid_huge: 16,
-  junk_satellite: 6, junk_panel: 6, junk_canister: 6,
+  asteroid_small_1: 8, asteroid_small_2: 8, asteroid_small_3: 8,
+  asteroid_medium_1: 16, asteroid_medium_2: 16, asteroid_medium_3: 16,
+  asteroid_large_1: 24, asteroid_large_2: 24,
+  asteroid_huge: 32,
+  junk_satellite: 12, junk_panel: 12, junk_canister: 12,
 }
 
 // Weighted: smalls appear often, huge ones rarely, junk occasionally
@@ -98,13 +100,13 @@ export class AsteroidSystem {
       if (s.x < -100 || s.x > GAME_WIDTH + 100 || s.y < -100 || s.y > GAME_HEIGHT + 100) continue
 
       const img = assets.getImage(a.variantKey)
-      const hw = img.width / 2
-      const hh = img.height / 2
+      const dw = img.width * SPRITE_SCALE
+      const dh = img.height * SPRITE_SCALE
 
       ctx.save()
       ctx.translate(s.x, s.y)
       ctx.rotate(a.rotation)
-      ctx.drawImage(img, -hw, -hh)
+      ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh)
       ctx.restore()
     }
   }
