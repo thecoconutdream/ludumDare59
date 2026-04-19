@@ -1,5 +1,6 @@
 export interface Scene {
   onEnter(): void
+  onResume?(): void   // called when re-exposed after another scene is popped
   onExit(): void
   update(dt: number): void
   render(ctx: CanvasRenderingContext2D): void
@@ -21,7 +22,7 @@ export class SceneManager {
   pop(): void {
     const scene = this.stack.pop()
     scene?.onExit()
-    this.current?.onEnter()
+    this.current?.onResume?.()  // resume, not re-enter — preserves state
   }
 
   replace(scene: Scene): void {

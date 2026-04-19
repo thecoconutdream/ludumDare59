@@ -54,16 +54,24 @@ export class SidePlanetScene implements Scene {
     this.timer += dt
     this.blink += dt
 
-    if (this.phase === 'landing' && this.timer > 1) {
+    if (this.input.isPressed('confirm')) {
+      if (this.phase === 'loot') {
+        this.scenes.pop()
+      } else {
+        // Skip straight to loot
+        this.phase = 'loot'
+        this.timer = 0
+      }
+      return
+    }
+
+    if (this.phase === 'landing' && this.timer > 0.6) {
       this.phase = 'exploring'
       this.timer = 0
     }
-    if (this.phase === 'exploring' && this.timer > 1.5) {
+    if (this.phase === 'exploring' && this.timer > 0.8) {
       this.phase = 'loot'
       this.timer = 0
-    }
-    if (this.phase === 'loot' && this.input.isPressed('confirm')) {
-      this.scenes.pop()
     }
   }
 

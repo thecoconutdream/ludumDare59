@@ -80,7 +80,7 @@ class Ship {
 class StarLayer {
   private stars: Array<{ x: number; y: number; size: number }>
 
-  constructor(count: number, private speed: number, seed: number) {
+  constructor(count: number, _speed: number, seed: number) {
     this.stars = Array.from({ length: count }, (_, i) => ({
       x: rng(seed + i * 127.1) * 320,
       y: rng(seed + i * 311.7) * 180,
@@ -88,12 +88,10 @@ class StarLayer {
     }))
   }
 
-  render(ctx: CanvasRenderingContext2D, camPos: Vector2): void {
+  render(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = '#ffffff'
     for (const s of this.stars) {
-      const x = ((s.x - camPos.x * this.speed) % 320 + 320) % 320
-      const y = ((s.y - camPos.y * this.speed) % 180 + 180) % 180
-      ctx.fillRect(Math.floor(x), Math.floor(y), s.size, s.size)
+      ctx.fillRect(s.x, s.y, s.size, s.size)
     }
   }
 }
@@ -211,6 +209,7 @@ export class SpaceFlightScene implements Scene {
   private nearbyPlanet: Planet | null = null
   private visitedSides = new Set<string>()
   private screenShake = 0
+  private interactionCooldown = 0  // prevents re-triggering land prompt on resume
 
   constructor(
     private scenes: SceneManager,
@@ -218,23 +217,30 @@ export class SpaceFlightScene implements Scene {
     private assets: AssetLoader,
   ) {
     this.starLayers = [
-      new StarLayer(35, 0.05, 1),
-      new StarLayer(20, 0.20, 2),
-      new StarLayer(10, 0.50, 3),
+      new StarLayer(40, 0, 1),   // static — stars are infinitely far away
+      new StarLayer(25, 0, 2),
+      new StarLayer(12, 0, 3),
     ]
     this.planets = generateRoute(gameState.deliveryCount)
     this.visitedSides = new Set(gameState.visitedSidePlanets)
   }
 
   onEnter(): void {
-    this.ship.pos = new Vector2(50, 0) // start near home
+    this.ship.pos = new Vector2(50, 0)
     this.camera.position = this.ship.pos.clone()
+  }
+
+  onResume(): void {
+    // Returning from SidePlanetScene — ship and camera state preserved, just
+    // add a short cooldown so the E key from the landing doesn't re-trigger
+    this.interactionCooldown = 0.4
   }
 
   onExit(): void {}
 
   update(dt: number): void {
     if (this.screenShake > 0) this.screenShake = Math.max(0, this.screenShake - dt * 5)
+    if (this.interactionCooldown > 0) this.interactionCooldown -= dt
 
     this.ship.update(dt, this.input, gameState.maxSpeed)
     this.camera.follow(this.ship.pos, 0.08)
@@ -289,7 +295,7 @@ export class SpaceFlightScene implements Scene {
         this.scenes.replace(new WordleScene(this.scenes, this.input, this.assets))
       }
 
-      if (this.nearbyPlanet.type === 'side' && this.input.isPressed('land')) {
+      if (this.nearbyPlanet.type === 'side' && this.input.isPressed('land') && this.interactionCooldown <= 0) {
         const planet = this.nearbyPlanet
         if (!this.visitedSides.has(planet.id)) {
           this.visitedSides.add(planet.id)
@@ -311,7 +317,7 @@ export class SpaceFlightScene implements Scene {
     ctx.fillStyle = '#070710'
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
-    for (const layer of this.starLayers) layer.render(ctx, this.camera.position)
+    for (const layer of this.starLayers) layer.render(ctx)
 
     for (const planet of this.planets) this.renderPlanet(ctx, planet)
 
