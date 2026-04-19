@@ -16,7 +16,7 @@ import { GameOverScene } from '@game/scenes/GameOverScene'
 import { debugSettings } from '@game/data/debug'
 
 export class SpaceFlightScene implements Scene {
-  private ship = new Ship()
+  private ship: Ship
   private camera = new Camera()
   private starLayers: StarLayer[]
   private planets: Planet[]
@@ -33,6 +33,7 @@ export class SpaceFlightScene implements Scene {
     private input: InputManager,
     private assets: AssetLoader,
   ) {
+    this.ship = new Ship(assets)
     this.starLayers = [new StarLayer(40, 1), new StarLayer(25, 2), new StarLayer(12, 3)]
     this.planets = Planet.generateRoute(gameState.deliveryCount)
     this.visitedSides = new Set(gameState.visitedSidePlanets)
@@ -136,7 +137,7 @@ export class SpaceFlightScene implements Scene {
       if (planet.type === 'client') planet.renderProximityRing(ctx, this.camera, this.ship.pos)
     }
     this.asteroids.render(ctx, this.camera)
-    this.ship.render(ctx, this.camera, this.assets)
+    this.ship.render(ctx, this.camera)
 
     ctx.restore()
     this.renderHUD(ctx)
