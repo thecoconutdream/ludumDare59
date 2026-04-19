@@ -8,8 +8,8 @@ import { FONT_SM } from '@game/data/ui'
 import { IntroScene } from '@game/scenes/IntroScene'
 
 const CHARACTERS: Array<{ type: CharacterType; label: string; desc: string; color: string }> = [
-  { type: 'cat', label: 'nami',  desc: 'Clever cat.\nSpeed bonus.', color: '#ff8844' },
-  { type: 'dog', label: 'yumi',  desc: 'Brave dog.\nShield bonus.', color: '#4488ff' },
+  { type: 'cat', label: 'NAMI',  desc: 'Felinian\ncourier', color: '#ff8844' },
+  { type: 'dog', label: 'YUMI',  desc: 'Canisian\ncourier', color: '#4488ff' },
 ]
 
 export class CharacterSelectScene implements Scene {
@@ -44,7 +44,7 @@ export class CharacterSelectScene implements Scene {
     ctx.fillStyle = '#ffffff'
     ctx.font = FONT_SM
     ctx.textAlign = 'center'
-    ctx.fillText('CHOOSE YOUR BREED', GAME_WIDTH / 2, 22)
+    ctx.fillText('CHOOSE YOUR SPECIES', GAME_WIDTH / 2, 22)
 
     ctx.fillStyle = '#556677'
     ctx.font = FONT_SM
@@ -79,14 +79,14 @@ export class CharacterSelectScene implements Scene {
       // Name
       ctx.fillStyle = isSelected ? ch.color : '#aaaacc'
       ctx.font = FONT_SM
-      ctx.fillText(ch.label, cx, cardY + 60)
+      ctx.fillText(ch.label, cx, cardY + 70)
 
       // Description
       ctx.fillStyle = '#889aaa'
       ctx.font = FONT_SM
       const lines = ch.desc.split('\n')
       for (let l = 0; l < lines.length; l++) {
-        ctx.fillText(lines[l], cx, cardY + 74 + l * 12)
+        ctx.fillText(lines[l], cx, cardY + 84 + l * 12, 86)
       }
 
       // Selected indicator

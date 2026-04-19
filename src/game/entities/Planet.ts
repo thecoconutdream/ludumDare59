@@ -2,7 +2,7 @@ import { Vector2 } from '@engine/physics/Vector2'
 import { Camera } from '@engine/rendering/Camera'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
-import { Biome, Loot } from '@game/data/GameState'
+import { Biome, Loot, gameState } from '@game/data/GameState'
 import { rng } from '@game/data/rng'
 import { FONT_SM } from '@game/data/ui'
 
@@ -83,23 +83,24 @@ export class Planet {
   }
 
   static generateRoute(deliveryCount: number): Planet[] {
-    const seed = deliveryCount * 1337
-    const angle = rng(seed) * Math.PI * 2
-    const dist = 1800 + rng(seed * 1.7) * 600
+    const s = gameState.gameSeed
+    const angle = Math.random() * Math.PI * 2
+    const dist = 1800 + Math.random() * 600
     const clientPos = new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)
     const biomes: Biome[] = ['ice', 'jungle', 'desert', 'lava']
-    const loots: Loot[] = ['outfit', 'upgrade', 'empty', 'empty']
+    const loots: Loot[] = ['outfit', 'upgrade', 'empty', 'outfit', 'empty', 'empty']
 
     const planets: Planet[] = [
       new Planet('home', Vector2.zero(), 'home', 30, PLANET_COLORS.home, 'COSMIC PIZZA', 0),
       new Planet('client', clientPos, 'client', 28, PLANET_COLORS.client, 'DELIVERY TARGET', (deliveryCount % 3) + 1),
     ]
 
-    for (let i = 0; i < 4; i++) {
-      const t = (i + 1) / 5
+    // Side and dead planets: along the route, perpendicular offset seeded per game
+    for (let i = 0; i < 6; i++) {
+      const t = (i + 1) / 7
       const base = clientPos.scale(t)
-      const perpAngle = angle + Math.PI / 2 + rng(seed + i * 77) * Math.PI
-      const offset = 250 + rng(seed + i * 200) * 200
+      const perpAngle = angle + Math.PI / 2 + (rng(s + i * 77) > 0.5 ? 0 : Math.PI)
+      const offset = 60 + rng(s + i * 200) * 80
       const biome = biomes[i % 4]
       planets.push(new Planet(
         `side_${i}`,
@@ -109,13 +110,14 @@ export class Planet {
       ))
     }
 
-    for (let i = 0; i < 3; i++) {
-      const t = (i + 1) / 4
+    for (let i = 0; i < 5; i++) {
+      const t = (i + 1) / 6
       const base = clientPos.scale(t)
-      const a = angle + Math.PI / 2 * (i % 2 === 0 ? 1 : -1) + rng(seed + i * 500) * 0.5
+      const perpAngle = angle + Math.PI / 2 * (rng(s + i * 500 + 1000) > 0.5 ? 1 : -1)
+      const offset = 50 + rng(s + i * 300 + 2000) * 60
       planets.push(new Planet(
         `dead_${i}`,
-        base.add(new Vector2(Math.cos(a) * (150 + i * 80), Math.sin(a) * (150 + i * 80))),
+        base.add(new Vector2(Math.cos(perpAngle) * offset, Math.sin(perpAngle) * offset)),
         'dead', 14, PLANET_COLORS.dead, '', (i % 2) + 1,
       ))
     }

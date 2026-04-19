@@ -30,6 +30,7 @@ export class SpaceFlightScene implements Scene {
   private interactionCooldown = 0
   private hitTimer = 0
   private invincibilityTimer = 0
+  private failedDelivery = false
 
   constructor(
     private scenes: SceneManager,
@@ -43,7 +44,13 @@ export class SpaceFlightScene implements Scene {
   }
 
   onEnter(): void {
-    this.ship.pos = new Vector2(50, 0)
+    if (gameState.escapedFromPos) {
+      this.ship.pos = new Vector2(gameState.escapedFromPos.x + 60, gameState.escapedFromPos.y)
+      gameState.escapedFromPos = null
+      this.failedDelivery = true
+    } else {
+      this.ship.pos = new Vector2(50, 0)
+    }
     this.camera.position = this.ship.pos.clone()
     this.asteroids.populate(this.ship.pos, 40)
     this.pickups.populate(this.ship.pos, 3, 2)
@@ -63,7 +70,7 @@ export class SpaceFlightScene implements Scene {
 
     if (this.hitTimer > 0) {
       this.hitTimer -= dt
-      this.ship.update(dt, this.input, gameState.maxSpeed)
+      this.ship.tick(dt, this.input, gameState.maxSpeed)
       this.camera.follow(this.ship.pos, 0.08)
       if (this.hitTimer <= 0) {
         if (gameState.lives <= 0) {
@@ -76,7 +83,7 @@ export class SpaceFlightScene implements Scene {
       return
     }
 
-    this.ship.update(dt, this.input, gameState.maxSpeed)
+    this.ship.tick(dt, this.input, gameState.maxSpeed)
     this.camera.follow(this.ship.pos, 0.08)
 
     const spawnInterval = Math.max(1.2, 2.5 - gameState.deliveryCount * 0.1)
@@ -116,15 +123,22 @@ export class SpaceFlightScene implements Scene {
 
     this.nearbyPlanet = null
     for (const planet of this.planets) {
-      if (planet.type !== 'home' && planet.type !== 'dead' && planet.isNearby(this.ship.pos)) {
-        this.nearbyPlanet = planet
-        break
-      }
+      const isHome = planet.type === 'home'
+      if (planet.type === 'dead') continue
+      if (isHome && !this.failedDelivery) continue
+      if (planet.isNearby(this.ship.pos)) { this.nearbyPlanet = planet; break }
     }
 
     if (this.nearbyPlanet) {
+      if (this.nearbyPlanet.type === 'home' && this.input.isPressed('confirm')) {
+        this.failedDelivery = false
+        this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets))
+        return
+      }
       if (this.nearbyPlanet.type === 'client' && this.input.isPressed('confirm')) {
-        gameState.clientVariant = this.nearbyPlanet.variant
+        const client = this.nearbyPlanet
+        gameState.clientVariant = client.variant
+        gameState.escapedFromPos = { x: client.pos.x, y: client.pos.y }
         this.scenes.replace(new WordleScene(this.scenes, this.input, this.assets))
       }
       if (this.nearbyPlanet.type === 'side' && this.input.isPressed('land') && this.interactionCooldown <= 0) {
@@ -170,9 +184,11 @@ export class SpaceFlightScene implements Scene {
   }
 
   private renderHUD(ctx: CanvasRenderingContext2D): void {
-    const client = this.planets.find(p => p.type === 'client')!
-    const dist = Math.floor(this.ship.pos.distanceTo(client.pos))
-    const angle = this.ship.pos.angleTo(client.pos)
+    const target = this.failedDelivery
+      ? this.planets.find(p => p.type === 'home')!
+      : this.planets.find(p => p.type === 'client')!
+    const dist = Math.floor(this.ship.pos.distanceTo(target.pos))
+    const angle = this.ship.pos.angleTo(target.pos)
 
     const cx = GAME_WIDTH - 18, cy = 18
     ctx.strokeStyle = '#334455'
@@ -215,7 +231,10 @@ export class SpaceFlightScene implements Scene {
     if (this.nearbyPlanet) {
       const isVisited = this.nearbyPlanet.type === 'side' && this.visitedSides.has(this.nearbyPlanet.id)
       ctx.textAlign = 'center'
-      if (this.nearbyPlanet.type === 'client') {
+      if (this.nearbyPlanet.type === 'home') {
+        ctx.fillStyle = '#44ff88'
+        ctx.fillText('[ENTR] BACK TO PIZZERIA', GAME_WIDTH / 2, GAME_HEIGHT - 10)
+      } else if (this.nearbyPlanet.type === 'client') {
         ctx.fillStyle = '#ffcc00'
         ctx.fillText('[ENTR] APPROACH', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       } else if (this.nearbyPlanet.type === 'side' && !isVisited) {

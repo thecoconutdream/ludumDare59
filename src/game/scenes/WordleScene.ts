@@ -6,7 +6,7 @@ import { gameState } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
 import { WORD_LENGTH, MAX_ATTEMPTS, LetterState, GuessResult, checkGuess } from '@game/data/wordleLogic'
 import { wordList } from '@game/data/wordList'
-import { SuccessScene } from '@game/scenes/SuccessScene'
+import { PizzeriaExteriorScene } from '@game/scenes/PizzeriaExteriorScene'
 import { EscapeScene } from '@game/scenes/EscapeScene'
 
 const createRandomAnswer = () => {
@@ -70,7 +70,7 @@ export class WordleScene implements Scene {
       this.resultTimer += dt
       if (this.resultTimer > 2) {
         if (this.result === 'won') {
-          this.scenes.replace(new SuccessScene(this.scenes, this.input, this.assets))
+          this.scenes.replace(new PizzeriaExteriorScene(this.scenes, this.input, this.assets, 'success'))
         } else {
           this.scenes.replace(new EscapeScene(this.scenes, this.input, this.assets))
         }

@@ -20,10 +20,8 @@ const BIOME_LABELS: Record<Biome, string> = {
 }
 
 const UPGRADE_NAMES: Record<string, string> = {
-  hyperdrive:        'Hyperdrive (+40%)',
-  thruster_damaged:  'Dmg Thruster (-30%)',
-  shield:            'Energy Shield',
-  nav_chip:          'Nav Chip (ETA)',
+  hyperdrive: 'Hyperdrive Boost',
+  shield:     'Energy Shield',
 }
 
 type Phase = 'landing' | 'exploring' | 'loot' | 'done'
@@ -77,17 +75,15 @@ export class SidePlanetScene implements Scene {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    // Surface background — placeholder color fill per biome
-    ctx.fillStyle = BIOME_COLORS[this.biome] + '33'
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
-
-    // Ground strip
-    ctx.fillStyle = BIOME_COLORS[this.biome]
-    ctx.fillRect(0, GAME_HEIGHT - 30, GAME_WIDTH, 30)
-
-    // Sky
-    ctx.fillStyle = '#0a0a1a'
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT - 30)
+    const bgKey = `bg_side_${this.biome}`
+    if (this.assets.hasImage(bgKey)) {
+      ctx.drawImage(this.assets.getImage(bgKey), 0, 0)
+    } else {
+      ctx.fillStyle = '#0a0a1a'
+      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT - 30)
+      ctx.fillStyle = BIOME_COLORS[this.biome]
+      ctx.fillRect(0, GAME_HEIGHT - 30, GAME_WIDTH, 30)
+    }
 
     // Biome label
     ctx.textAlign = 'center'
@@ -112,53 +108,61 @@ export class SidePlanetScene implements Scene {
     }
   }
 
+  private wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+    const words = text.split(' ')
+    const lines: string[] = []
+    let current = ''
+    for (const word of words) {
+      const test = current ? `${current} ${word}` : word
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current)
+        current = word
+      } else {
+        current = test
+      }
+    }
+    if (current) lines.push(current)
+    return lines
+  }
+
   private renderLootPopup(ctx: CanvasRenderingContext2D): void {
-    const px = GAME_WIDTH / 2 - 80
-    const py = 60
+    const BOX_W = 200
+    const px = GAME_WIDTH / 2 - BOX_W / 2
+    const py = 55
 
     ctx.fillStyle = '#111122'
-    ctx.fillRect(px, py, 160, 70)
+    ctx.fillRect(px, py, BOX_W, 80)
 
-    if (this.loot === 'empty') {
-      ctx.strokeStyle = '#556677'
-    } else if (this.loot === 'outfit') {
-      ctx.strokeStyle = '#ffcc00'
-    } else {
-      ctx.strokeStyle = '#4488ff'
-    }
+    ctx.strokeStyle = this.loot === 'empty' ? '#556677' : this.loot === 'outfit' ? '#ffcc00' : '#4488ff'
     ctx.lineWidth = 1
-    ctx.strokeRect(px, py, 160, 70)
+    ctx.strokeRect(px, py, BOX_W, 80)
 
     ctx.textAlign = 'center'
+    ctx.font = FONT_SM
     const cx = GAME_WIDTH / 2
+    const innerW = BOX_W - 16
 
     if (this.loot === 'empty') {
       ctx.fillStyle = '#556677'
-      ctx.font = FONT_SM
-      ctx.fillText('Nothing here...', cx, py + 25)
+      ctx.fillText('Nothing here...', cx, py + 22)
       ctx.fillStyle = '#aaaacc'
-      ctx.font = FONT_SM
-      ctx.fillText('(Just a barren planet)', cx, py + 38)
+      const lines = this.wrapText(ctx, '(Just a barren planet)', innerW)
+      lines.forEach((l, i) => ctx.fillText(l, cx, py + 34 + i * 12))
     } else if (this.loot === 'outfit') {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = FONT_SM
       ctx.fillText('OUTFIT PIECE FOUND!', cx, py + 22)
       ctx.fillStyle = '#ffffff'
-      ctx.font = FONT_SM
-      ctx.fillText(this.lootLabel, cx, py + 36)
+      this.wrapText(ctx, this.lootLabel, innerW).forEach((l, i) => ctx.fillText(l, cx, py + 36 + i * 12))
     } else {
       ctx.fillStyle = '#4488ff'
-      ctx.font = FONT_SM
       ctx.fillText('SHIP UPGRADE!', cx, py + 22)
       ctx.fillStyle = '#ffffff'
-      ctx.font = FONT_SM
-      ctx.fillText(this.lootLabel, cx, py + 36, 150)
+      this.wrapText(ctx, this.lootLabel, innerW).forEach((l, i) => ctx.fillText(l, cx, py + 36 + i * 12))
     }
 
     if (Math.sin(this.blink * 4) > 0) {
       ctx.fillStyle = '#aaaacc'
-      ctx.font = FONT_SM
-      ctx.fillText('PRESS ENTR to leave', cx, py + 56)
+      ctx.fillText('PRESS ENTR to leave', cx, py + 68)
     }
   }
 
@@ -168,15 +172,11 @@ export class SidePlanetScene implements Scene {
     if (this.loot === 'upgrade') {
       const upgrades = [
         { key: 'hyperdrive', label: UPGRADE_NAMES['hyperdrive'] },
-        { key: 'thruster_damaged', label: UPGRADE_NAMES['thruster_damaged'] },
-        { key: 'shield', label: UPGRADE_NAMES['shield'] },
-        { key: 'nav_chip', label: UPGRADE_NAMES['nav_chip'] },
+        { key: 'shield',     label: UPGRADE_NAMES['shield'] },
       ]
       const picked = upgrades[Math.floor(Math.random() * upgrades.length)]
       if (picked.key === 'hyperdrive') gameState.upgrades.hyperdrive = true
-      if (picked.key === 'thruster_damaged') gameState.upgrades.thrusterDamaged = true
       if (picked.key === 'shield') gameState.upgrades.shield = true
-      if (picked.key === 'nav_chip') gameState.upgrades.navChip = true
       return picked.label
     }
 

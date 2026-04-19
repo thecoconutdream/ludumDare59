@@ -109,7 +109,7 @@ export const assetManifest: AssetDef[] = [
   {
     key: 'planet_home_title',
     path: 'sprites/planets/planet_home_title.png',
-    width: 96, height: 110,
+    width: 200, height: 200,
     placeholderColor: C.planet, label: 'HOME TITLE',
   },
   {

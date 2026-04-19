@@ -61,8 +61,12 @@ export class SuccessScene implements Scene {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = '#0a0f0a'
-    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
+    if (this.assets.hasImage('bg_pizzeria_interior')) {
+      ctx.drawImage(this.assets.getImage('bg_pizzeria_interior'), 0, 0)
+    } else {
+      ctx.fillStyle = '#0a0f0a'
+      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
+    }
 
     // Particles
     for (const p of this.particles) {

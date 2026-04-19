@@ -4,7 +4,7 @@ import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
-import { SpaceFlightScene } from '@game/scenes/SpaceFlightScene'
+import { PizzeriaExteriorScene } from '@game/scenes/PizzeriaExteriorScene'
 
 interface IntroPhase {
   duration: number
@@ -16,8 +16,6 @@ interface IntroPhase {
 export class IntroScene implements Scene {
   private phaseIndex = 0
   private phaseTimer = 0
-  private fadeAlpha = 0
-  private shakeY = 0
 
   private readonly phases: IntroPhase[]
 
@@ -26,7 +24,7 @@ export class IntroScene implements Scene {
     private input: InputManager,
     private assets: AssetLoader,
   ) {
-    const name = gameState.character === 'cat' ? 'nami' : 'yumi'
+    const name = gameState.character === 'cat' ? 'Nami' : 'Yumi'
     this.phases = [
       {
         duration: 2.5,
@@ -46,25 +44,12 @@ export class IntroScene implements Scene {
         lines: ['"Wealthy client."', '"Don\'t mess this up."'],
         subLines: ['You grab the pizza box. It\'s warm.'],
       },
-      {
-        duration: 2.5,
-        bgKey: 'bg_pizzeria_exterior',
-        lines: ['Heading to the launchpad...'],
-        subLines: ['The rocket hisses on its pad.'],
-      },
-      {
-        duration: 2.0,
-        bgKey: 'bg_pizzeria_exterior',
-        lines: ['IGNITION'],
-        subLines: ['3... 2... 1...'],
-      },
     ]
   }
 
   onEnter(): void {
     this.phaseIndex = 0
     this.phaseTimer = 0
-    this.fadeAlpha = 0
   }
 
   onExit(): void {}
@@ -75,21 +60,13 @@ export class IntroScene implements Scene {
       return
     }
 
-    // Liftoff phase plays out automatically once triggered
-    if (this.phaseIndex === this.phases.length - 1) {
-      this.phaseTimer += dt
-      const progress = this.phaseTimer / this.phases[this.phaseIndex].duration
-      this.shakeY = progress > 0.4 ? (Math.random() - 0.5) * progress * 6 : 0
-      this.fadeAlpha = Math.min(1, (progress - 0.6) / 0.4)
-      if (this.phaseTimer >= this.phases[this.phaseIndex].duration) {
-        this.launch()
-      }
-      return
-    }
-
     if (this.input.isPressed('confirm')) {
-      this.phaseIndex++
-      this.phaseTimer = 0
+      if (this.phaseIndex >= this.phases.length - 1) {
+        this.launch()
+      } else {
+        this.phaseIndex++
+        this.phaseTimer = 0
+      }
     }
   }
 
@@ -97,28 +74,24 @@ export class IntroScene implements Scene {
     const phase = this.phases[Math.min(this.phaseIndex, this.phases.length - 1)]
 
     ctx.save()
-    ctx.translate(0, Math.round(this.shakeY))
 
     // Background
     if (this.assets.hasImage(phase.bgKey)) {
       ctx.drawImage(this.assets.getImage(phase.bgKey), 0, 0)
     } else {
-      ctx.fillStyle = phase.bgKey.includes('exterior') ? '#1a0a2a' : '#2a1500'
+      ctx.fillStyle = '#2a1500'
       ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
-
-      // Simple placeholder scene elements
-      if (phase.bgKey.includes('interior')) {
-        this.drawPizzeriaInterior(ctx)
-      } else {
-        this.drawPizzeriaExterior(ctx)
-      }
+      this.drawPizzeriaInterior(ctx)
     }
 
     // Dialog box
     const lineH = 14
     const subLineH = 12
+    const innerW = GAME_WIDTH - 16 - 16
+    ctx.font = FONT_SM
+    const wrappedSubs = phase.subLines?.flatMap(l => this.wrapText(ctx, l, innerW)) ?? []
     const boxH = phase.subLines
-      ? 10 + phase.lines.length * lineH + 6 + phase.subLines.length * subLineH + 8
+      ? 10 + phase.lines.length * lineH + 6 + wrappedSubs.length * subLineH + 8
       : 10 + phase.lines.length * lineH + 8
     const boxY = GAME_HEIGHT - boxH - 8
     ctx.fillStyle = '#000000cc'
@@ -137,8 +110,8 @@ export class IntroScene implements Scene {
     if (phase.subLines) {
       ctx.fillStyle = '#aaaacc'
       ctx.font = FONT_SM
-      for (let i = 0; i < phase.subLines.length; i++) {
-        ctx.fillText(phase.subLines[i], 16, boxY + 14 + phase.lines.length * 14 + 6 + i * 12)
+      for (let i = 0; i < wrappedSubs.length; i++) {
+        ctx.fillText(wrappedSubs[i], 16, boxY + 14 + phase.lines.length * 14 + 6 + i * 12)
       }
     }
 
@@ -149,16 +122,27 @@ export class IntroScene implements Scene {
     ctx.fillText(`${this.phaseIndex + 1}/${this.phases.length} ENTR`, GAME_WIDTH - 12, boxY + boxH - 4)
 
     ctx.restore()
+  }
 
-    // Fade to black on liftoff
-    if (this.fadeAlpha > 0) {
-      ctx.fillStyle = `rgba(0,0,0,${this.fadeAlpha})`
-      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
+  private wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+    const words = text.split(' ')
+    const lines: string[] = []
+    let current = ''
+    for (const word of words) {
+      const test = current ? `${current} ${word}` : word
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current)
+        current = word
+      } else {
+        current = test
+      }
     }
+    if (current) lines.push(current)
+    return lines
   }
 
   private launch(): void {
-    this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets))
+    this.scenes.replace(new PizzeriaExteriorScene(this.scenes, this.input, this.assets, 'intro'))
   }
 
   private drawPizzeriaInterior(ctx: CanvasRenderingContext2D): void {

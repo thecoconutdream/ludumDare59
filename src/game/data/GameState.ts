@@ -7,6 +7,7 @@ class GameState {
   character: CharacterType = 'cat'
   deliveryCount = 0
   lives = 3
+  gameSeed = Math.random() * 100000
   unlockedOutfits: string[] = []
   visitedSidePlanets = new Set<string>()
 
@@ -21,6 +22,7 @@ class GameState {
   pendingLoot: Loot | null = null
   pendingBiome: Biome | null = null
   clientVariant = 1
+  escapedFromPos: { x: number; y: number } | null = null
 
   resetRun(): void {
     this.deliveryCount = 0
@@ -31,6 +33,8 @@ class GameState {
     this.pendingLoot = null
     this.pendingBiome = null
     this.clientVariant = 1
+    this.escapedFromPos = null
+    this.gameSeed = Math.random() * 100000
   }
 
   get maxSpeed(): number {

@@ -67,7 +67,13 @@ export class Ship extends GameObject {
     this.igniter.activateHyperdrive()
   }
 
-  update(dt: number, input: InputManager, maxSpeed: number): void {
+  override update(dt: number): void {
+    this.pos = this.pos.add(this.vel.scale(dt))
+    this.anim.update(dt)
+    this.updateChildren(dt)
+  }
+
+  tick(dt: number, input: InputManager, maxSpeed: number): void {
     if (this.state === 'fly') {
       if (input.isHeld('left'))  this.angle -= this.turnSpeed * dt
       if (input.isHeld('right')) this.angle += this.turnSpeed * dt
@@ -95,9 +101,7 @@ export class Ship extends GameObject {
       }
     }
 
-    this.pos = this.pos.add(this.vel.scale(dt))
-    this.anim.update(dt)
-    this.updateChildren(dt)
+    this.update(dt)
   }
 
   render(ctx: CanvasRenderingContext2D, camera: Camera): void {
