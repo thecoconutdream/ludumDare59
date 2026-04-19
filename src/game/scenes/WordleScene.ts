@@ -5,11 +5,16 @@ import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
 import { WORD_LENGTH, MAX_ATTEMPTS, LetterState, GuessResult, checkGuess } from '@game/data/wordleLogic'
+import { wordList } from '@game/data/wordList'
 import { SuccessScene } from '@game/scenes/SuccessScene'
 import { EscapeScene } from '@game/scenes/EscapeScene'
 
-// TODO(colleague): Replace ANSWER with random word from wordList.ts
-export const ANSWER = 'PIZZA'
+const validWords = wordList.filter((word) => word.length === WORD_LENGTH)
+if (validWords.length === 0) {
+  throw new Error('wordList must contain at least one 5-letter word')
+}
+
+export const ANSWER = validWords[Math.floor(Math.random() * validWords.length)]
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
 const CELL = 16
@@ -18,9 +23,9 @@ const GRID_X = Math.floor(GAME_WIDTH / 2 - (WORD_LENGTH * (CELL + GAP) - GAP) / 
 const GRID_Y = 14
 
 const KB_ROWS = [
-  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['Q','W','E','R','T','Z','U','I','O','P'],
   ['A','S','D','F','G','H','J','K','L'],
-  ['OK','Z','X','C','V','B','N','M','<'],
+  ['OK','Y','X','C','V','B','N','M','<'],
 ]
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
