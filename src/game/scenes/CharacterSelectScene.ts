@@ -2,6 +2,7 @@ import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
+import { SpriteSheet } from '@engine/rendering/SpriteSheet'
 import { gameState, CharacterType } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
 import { IntroScene } from '@game/scenes/IntroScene'
@@ -65,13 +66,15 @@ export class CharacterSelectScene implements Scene {
       ctx.lineWidth = isSelected ? 2 : 1
       ctx.strokeRect(cardX, cardY, 100, 110)
 
-      // Character sprite placeholder
-      ctx.fillStyle = ch.color + (isSelected ? 'cc' : '55')
-      ctx.fillRect(cx - 16, cardY + 8, 32, 40)
-      ctx.fillStyle = '#ffffff'
-      ctx.font = '24px sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText(ch.type === 'cat' ? '🐱' : '🐶', cx, cardY + 37)
+      // Character sprite — idle frame 0
+      const assetKey = ch.type === 'cat' ? 'player_cat' : 'player_dog'
+      if (this.assets.hasImage(assetKey)) {
+        const sheet = new SpriteSheet(this.assets.getImage(assetKey), 32, 48)
+        sheet.drawFrame(ctx, 0, cx, cardY + 30)
+      } else {
+        ctx.fillStyle = ch.color + (isSelected ? 'cc' : '55')
+        ctx.fillRect(cx - 16, cardY + 8, 32, 40)
+      }
 
       // Name
       ctx.fillStyle = isSelected ? ch.color : '#aaaacc'
