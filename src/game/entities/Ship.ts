@@ -63,7 +63,7 @@ export class Ship extends GameObject {
 
   activateHyperdrive(): void {
     this.acceleration = this.BASE_ACCELERATION * 2.2
-    this.brakeDeceleration *= 2.5
+    this.brakeDeceleration = INITIAL_STATS.brakeDeceleration * 2.5
     this.igniter.activateHyperdrive()
   }
 

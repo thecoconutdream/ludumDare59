@@ -284,19 +284,14 @@ export class EscapeScene implements Scene {
   }
 
   private renderLives(ctx: CanvasRenderingContext2D): void {
-    const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
-    const img = this.assets.getImage(charKey)
-    const iconW = 10, iconH = 15
-    const gap = 4
-    const total = 3 * iconW + 2 * gap
-    const startX = Math.floor(GAME_WIDTH / 2 - total / 2)
     const blink = this.invincibilityTimer > 0 && Math.floor(Date.now() / 120) % 2 === 0
-
+    const size = 6, gap = 4
+    const total = 3 * size + 2 * gap
+    const startX = Math.floor(GAME_WIDTH / 2 - total / 2)
     for (let i = 0; i < 3; i++) {
-      const x = startX + i * (iconW + gap)
-      ctx.globalAlpha = i < gameState.lives ? (blink ? 0.3 : 1) : 0.2
-      ctx.drawImage(img, 0, 0, 32, 48, x, 36, iconW, iconH)
+      const alive = i < gameState.lives
+      ctx.fillStyle = alive ? (blink ? '#ff444488' : '#ff4444') : '#332222'
+      ctx.fillRect(startX + i * (size + gap), 36, size, size)
     }
-    ctx.globalAlpha = 1
   }
 }

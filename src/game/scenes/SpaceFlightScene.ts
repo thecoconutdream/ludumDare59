@@ -58,6 +58,7 @@ export class SpaceFlightScene implements Scene {
 
   onResume(): void {
     this.interactionCooldown = 0.4
+    if (gameState.upgrades.hyperdrive) this.ship.activateHyperdrive()
   }
 
   onExit(): void {}
@@ -135,7 +136,7 @@ export class SpaceFlightScene implements Scene {
         this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets))
         return
       }
-      if (this.nearbyPlanet.type === 'client' && this.input.isPressed('confirm')) {
+      if (this.nearbyPlanet.type === 'client' && !this.failedDelivery && this.input.isPressed('confirm')) {
         const client = this.nearbyPlanet
         gameState.clientVariant = client.variant
         gameState.escapedFromPos = { x: client.pos.x, y: client.pos.y }
@@ -171,7 +172,10 @@ export class SpaceFlightScene implements Scene {
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
     for (const layer of this.starLayers) layer.render(ctx)
-    for (const planet of this.planets) planet.render(ctx, this.camera, this.assets, this.visitedSides.has(planet.id))
+    for (const planet of this.planets) {
+      const armed = this.failedDelivery && planet.type === 'client'
+      planet.render(ctx, this.camera, this.assets, this.visitedSides.has(planet.id), armed)
+    }
     for (const planet of this.planets) {
       if (planet.type === 'client') planet.renderProximityRing(ctx, this.camera, this.ship.pos)
     }
@@ -234,9 +238,12 @@ export class SpaceFlightScene implements Scene {
       if (this.nearbyPlanet.type === 'home') {
         ctx.fillStyle = '#44ff88'
         ctx.fillText('[ENTR] BACK TO PIZZERIA', GAME_WIDTH / 2, GAME_HEIGHT - 10)
-      } else if (this.nearbyPlanet.type === 'client') {
+      } else if (this.nearbyPlanet.type === 'client' && !this.failedDelivery) {
         ctx.fillStyle = '#ffcc00'
         ctx.fillText('[ENTR] APPROACH', GAME_WIDTH / 2, GAME_HEIGHT - 10)
+      } else if (this.nearbyPlanet.type === 'client' && this.failedDelivery) {
+        ctx.fillStyle = '#ff4444'
+        ctx.fillText('ACCESS DENIED', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       } else if (this.nearbyPlanet.type === 'side' && !isVisited) {
         ctx.fillStyle = '#44aaff'
         ctx.fillText('[E] LAND', GAME_WIDTH / 2, GAME_HEIGHT - 10)

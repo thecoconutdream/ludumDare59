@@ -36,9 +36,9 @@ export class Planet {
     return shipPos.distanceTo(this.pos) < this.radius + 25
   }
 
-  private assetKey(): string {
+  private assetKey(armed = false): string {
     if (this.type === 'home')   return 'planet_home'
-    if (this.type === 'client') return `planet_client_${this.variant}`
+    if (this.type === 'client') return armed ? `planet_client_${this.variant}_armed` : `planet_client_${this.variant}`
     if (this.type === 'side')   return `planet_side_${this.biome}_${this.variant}`
     return `planet_side_dead_${this.variant}`
   }
@@ -48,7 +48,7 @@ export class Planet {
     return 40
   }
 
-  render(ctx: CanvasRenderingContext2D, camera: Camera, assets: AssetLoader, visited: boolean): void {
+  render(ctx: CanvasRenderingContext2D, camera: Camera, assets: AssetLoader, visited: boolean, armed = false): void {
     const s = camera.worldToScreen(this.pos)
     if (s.x < -60 || s.x > GAME_WIDTH + 60 || s.y < -60 || s.y > GAME_HEIGHT + 60) return
 
@@ -57,7 +57,7 @@ export class Planet {
 
     ctx.save()
     if (visited) ctx.globalAlpha = 0.5
-    ctx.drawImage(assets.getImage(this.assetKey()), s.x - half, s.y - half)
+    ctx.drawImage(assets.getImage(this.assetKey(armed)), s.x - half, s.y - half)
     ctx.restore()
 
     if (this.type !== 'dead') {
@@ -84,9 +84,16 @@ export class Planet {
 
   static generateRoute(deliveryCount: number): Planet[] {
     const s = gameState.gameSeed
-    const angle = Math.random() * Math.PI * 2
-    const dist = 1800 + Math.random() * 600
-    const clientPos = new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)
+    let clientPos: Vector2
+    let angle: number
+    if (gameState.escapedFromPos) {
+      clientPos = new Vector2(gameState.escapedFromPos.x, gameState.escapedFromPos.y)
+      angle = Math.atan2(clientPos.y, clientPos.x)
+    } else {
+      angle = Math.random() * Math.PI * 2
+      const dist = 1800 + Math.random() * 600
+      clientPos = new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)
+    }
     const biomes: Biome[] = ['ice', 'jungle', 'desert', 'lava']
     const loots: Loot[] = ['outfit', 'upgrade', 'empty', 'outfit', 'empty', 'empty']
 
