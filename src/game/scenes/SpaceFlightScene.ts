@@ -10,6 +10,7 @@ import { Ship } from '@game/entities/Ship'
 import { StarLayer } from '@game/entities/StarLayer'
 import { Planet } from '@game/entities/Planet'
 import { AsteroidSystem } from '@game/entities/AsteroidSystem'
+import { PickupSystem } from '@game/entities/PickupSystem'
 import { WordleScene } from '@game/scenes/WordleScene'
 import { SidePlanetScene } from '@game/scenes/SidePlanetScene'
 import { GameOverScene } from '@game/scenes/GameOverScene'
@@ -21,6 +22,7 @@ export class SpaceFlightScene implements Scene {
   private starLayers: StarLayer[]
   private planets: Planet[]
   private asteroids = new AsteroidSystem()
+  private pickups = new PickupSystem()
   private asteroidTimer = 0
   private nearbyPlanet: Planet | null = null
   private visitedSides = new Set<string>()
@@ -44,6 +46,7 @@ export class SpaceFlightScene implements Scene {
     this.ship.pos = new Vector2(50, 0)
     this.camera.position = this.ship.pos.clone()
     this.asteroids.populate(this.ship.pos, 40)
+    this.pickups.populate(this.ship.pos, 3, 2)
   }
 
   onResume(): void {
@@ -83,13 +86,26 @@ export class SpaceFlightScene implements Scene {
       this.asteroidTimer = 0
     }
     this.asteroids.update(dt, this.ship.pos)
+    this.pickups.update(dt, this.ship.pos)
+
+    const collected = this.pickups.checkCollection(this.ship.pos)
+    if (collected) {
+      this.pickups.remove(collected)
+      if (collected.type === 'hyperdrive') {
+        this.ship.activateHyperdrive()
+        gameState.upgrades.hyperdrive = true
+      } else {
+        gameState.upgrades.shield = true
+      }
+    }
 
     const hit = this.invincibilityTimer <= 0 ? this.asteroids.checkCollision(this.ship.bounds) : null
     if (hit) {
       if (gameState.upgrades.shield) {
         gameState.upgrades.shield = false
         this.asteroids.remove(hit)
-        this.screenShake = 1
+        this.ship.vel = this.ship.vel.normalized().scale(-50)
+        this.screenShake = 1.2
       } else {
         gameState.lives--
         this.ship.triggerHit()
@@ -146,6 +162,7 @@ export class SpaceFlightScene implements Scene {
       if (planet.type === 'client') planet.renderProximityRing(ctx, this.camera, this.ship.pos)
     }
     this.asteroids.render(ctx, this.camera)
+    this.pickups.render(ctx, this.camera)
     this.ship.render(ctx, this.camera)
 
     ctx.restore()

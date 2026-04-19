@@ -41,10 +41,13 @@ export class Ship {
   private isAccelerating = false
   private particles: Particle[] = []
   private ignitionColors = ['#ff6600', '#ff8822', '#ffaa44', '#ff4400']
+  private readonly rainbowColors = ['#ff0000', '#ff8800', '#ffff00', '#00ff88', '#0088ff', '#aa00ff', '#ff00aa']
   private ignitionSpawnTimer = 0
   private anim = new AnimationPlayer()
   private state: 'fly' | 'hit' = 'fly'
   private assets: AssetLoader
+  hyperdriveTimer = 0
+  private readonly BASE_ACCELERATION = INITIAL_STATS.acceleration
 
   constructor(assets: AssetLoader) {
     this.assets = assets
@@ -60,6 +63,12 @@ export class Ship {
     this.state = 'fly'
     this.vel = Vector2.zero()
     this.anim.play(PlayerAnims.fly)
+  }
+
+  activateHyperdrive(): void {
+    this.acceleration = this.BASE_ACCELERATION * 2.2
+    this.brakeDeceleration *= 2.5
+    this.ignitionColors = [...this.rainbowColors]
   }
 
   update(dt: number, input: InputManager, maxSpeed: number): void {
