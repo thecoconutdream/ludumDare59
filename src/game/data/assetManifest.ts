@@ -15,17 +15,17 @@ const C = {
 
 export const assetManifest: AssetDef[] = [
 
-  // ─── Characters — 32×48px frames, sheet 8 cols × 6 rows = 256×288px ───────
+  // ─── Characters — 32×48px frames, single row of 17 frames = 544×48px ───────
   {
     key: 'player_cat',
-    path: 'sprites/player/cat_base.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
+    path: 'sprites/player/nami.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.character, label: 'CAT',
   },
   {
     key: 'player_dog',
-    path: 'sprites/player/dog_base.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
+    path: 'sprites/player/yumi.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.character, label: 'DOG',
   },
 
@@ -82,26 +82,26 @@ export const assetManifest: AssetDef[] = [
   // ─── Spaceship ─────────────────────────────────────────────────────────────
   {
     key: 'ship',
-    path: 'sprites/ship/spaceship.png',
-    width: 256, height: 144, frameWidth: 32, frameHeight: 24,
+    path: 'sprites/spaceship/spaceship.png',
+    width: 64, height: 48,
     placeholderColor: C.ship, label: 'SHIP',
   },
   {
     key: 'ship_upgrade_boost',
     path: 'sprites/ship/upgrade_boost_glow.png',
-    width: 128, height: 24, frameWidth: 32, frameHeight: 24,
+    width: 192, height: 32, frameWidth: 48, frameHeight: 32,
     placeholderColor: C.ship, label: 'BOOST',
   },
   {
     key: 'ship_upgrade_damaged',
     path: 'sprites/ship/upgrade_damaged_smoke.png',
-    width: 128, height: 24, frameWidth: 32, frameHeight: 24,
+    width: 192, height: 32, frameWidth: 48, frameHeight: 32,
     placeholderColor: C.ship, label: 'DMGSMK',
   },
   {
     key: 'ship_upgrade_shield',
     path: 'sprites/ship/upgrade_shield.png',
-    width: 128, height: 24, frameWidth: 32, frameHeight: 24,
+    width: 192, height: 32, frameWidth: 48, frameHeight: 32,
     placeholderColor: C.ship, label: 'SHIELD',
   },
 

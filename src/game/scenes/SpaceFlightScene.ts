@@ -26,6 +26,7 @@ export class SpaceFlightScene implements Scene {
   private visitedSides = new Set<string>()
   private screenShake = 0
   private interactionCooldown = 0
+  private hitTimer = 0
 
   constructor(
     private scenes: SceneManager,
@@ -53,6 +54,16 @@ export class SpaceFlightScene implements Scene {
     if (this.screenShake > 0) this.screenShake = Math.max(0, this.screenShake - dt * 5)
     if (this.interactionCooldown > 0) this.interactionCooldown -= dt
 
+    if (this.hitTimer > 0) {
+      this.hitTimer -= dt
+      this.ship.update(dt, this.input, gameState.maxSpeed)
+      this.camera.follow(this.ship.pos, 0.08)
+      if (this.hitTimer <= 0) {
+        this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets))
+      }
+      return
+    }
+
     this.ship.update(dt, this.input, gameState.maxSpeed)
     this.camera.follow(this.ship.pos, 0.08)
 
@@ -71,8 +82,9 @@ export class SpaceFlightScene implements Scene {
         this.asteroids.remove(hit)
         this.screenShake = 1
       } else {
-        this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets))
-        return
+        this.ship.triggerHit()
+        this.screenShake = 1.5
+        this.hitTimer = 0.9
       }
     }
 
@@ -124,7 +136,7 @@ export class SpaceFlightScene implements Scene {
       if (planet.type === 'client') planet.renderProximityRing(ctx, this.camera, this.ship.pos)
     }
     this.asteroids.render(ctx, this.camera)
-    this.ship.render(ctx, this.camera)
+    this.ship.render(ctx, this.camera, this.assets)
 
     ctx.restore()
     this.renderHUD(ctx)
