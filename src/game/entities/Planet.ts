@@ -1,5 +1,6 @@
 import { Vector2 } from '@engine/physics/Vector2'
 import { Camera } from '@engine/rendering/Camera'
+import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { Biome, Loot } from '@game/data/GameState'
 import { rng } from '@game/data/rng'
@@ -35,25 +36,36 @@ export class Planet {
     return shipPos.distanceTo(this.pos) < this.radius + 25
   }
 
-  render(ctx: CanvasRenderingContext2D, camera: Camera, visited: boolean): void {
+  private assetKey(): string {
+    if (this.type === 'home')   return 'planet_home'
+    if (this.type === 'client') return `planet_client_${this.variant}`
+    if (this.type === 'side')   return `planet_side_${this.biome}_${this.variant}`
+    return `planet_dead_${this.variant}`
+  }
+
+  private spriteSize(): number {
+    if (this.type === 'home' || this.type === 'client') return 48
+    if (this.type === 'side') return 40
+    return 32
+  }
+
+  render(ctx: CanvasRenderingContext2D, camera: Camera, assets: AssetLoader, visited: boolean): void {
     const s = camera.worldToScreen(this.pos)
     if (s.x < -60 || s.x > GAME_WIDTH + 60 || s.y < -60 || s.y > GAME_HEIGHT + 60) return
 
+    const size = this.spriteSize()
+    const half = size / 2
+
     ctx.save()
-    ctx.beginPath()
-    ctx.arc(s.x, s.y, this.radius, 0, Math.PI * 2)
-    ctx.fillStyle = this.color + (visited ? '55' : 'bb')
-    ctx.fill()
-    ctx.strokeStyle = this.color
-    ctx.lineWidth = 1
-    ctx.stroke()
+    if (visited) ctx.globalAlpha = 0.5
+    ctx.drawImage(assets.getImage(this.assetKey()), s.x - half, s.y - half)
     ctx.restore()
 
     if (this.type !== 'dead') {
       ctx.fillStyle = this.type === 'client' ? '#ffcc00' : '#aaaacc'
       ctx.font = FONT_SM
       ctx.textAlign = 'center'
-      ctx.fillText(this.label, s.x, s.y + this.radius + 8)
+      ctx.fillText(this.label, s.x, s.y + half + 8)
     }
   }
 

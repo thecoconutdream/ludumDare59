@@ -157,7 +157,7 @@ export class SpaceFlightScene implements Scene {
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
     for (const layer of this.starLayers) layer.render(ctx)
-    for (const planet of this.planets) planet.render(ctx, this.camera, this.visitedSides.has(planet.id))
+    for (const planet of this.planets) planet.render(ctx, this.camera, this.assets, this.visitedSides.has(planet.id))
     for (const planet of this.planets) {
       if (planet.type === 'client') planet.renderProximityRing(ctx, this.camera, this.ship.pos)
     }
