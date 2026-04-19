@@ -15,10 +15,19 @@ export interface AsteroidData {
 const VARIANT_RADII: Record<string, number> = {
   asteroid_small_1: 4, asteroid_small_2: 4, asteroid_small_3: 4,
   asteroid_medium_1: 8, asteroid_medium_2: 8, asteroid_medium_3: 8,
-  asteroid_large_1: 12, asteroid_large_2: 12,
+  asteroid_large_1: 14, asteroid_large_2: 14,
+  asteroid_huge_1: 28, asteroid_huge_2: 36,
 }
 
-const VARIANTS = Object.keys(VARIANT_RADII)
+// Weighted: smalls appear often, huge ones rarely
+const VARIANT_POOL = [
+  'asteroid_small_1', 'asteroid_small_2', 'asteroid_small_3',
+  'asteroid_small_1', 'asteroid_small_2',
+  'asteroid_medium_1', 'asteroid_medium_2', 'asteroid_medium_3',
+  'asteroid_medium_1', 'asteroid_medium_2',
+  'asteroid_large_1', 'asteroid_large_2',
+  'asteroid_huge_1', 'asteroid_huge_2',
+]
 
 export class AsteroidSystem {
   private asteroids: AsteroidData[] = []
@@ -28,21 +37,43 @@ export class AsteroidSystem {
       a.pos = a.pos.add(a.vel.scale(dt))
       a.rotation += a.rotSpeed * dt
     }
-    this.asteroids = this.asteroids.filter(a => a.pos.distanceTo(shipPos) < 500)
+    this.asteroids = this.asteroids.filter(a => a.pos.distanceTo(shipPos) < 900)
+  }
+
+  populate(origin: Vector2, count: number): void {
+    for (let i = 0; i < count; i++) {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.8
+      const dist = 280 + Math.random() * 350
+      const variantKey = VARIANT_POOL[Math.floor(Math.random() * VARIANT_POOL.length)]
+      // Bias velocity outward so asteroids don't drift into the player immediately
+      const outward = new Vector2(Math.cos(angle), Math.sin(angle)).scale(8 + Math.random() * 10)
+      const drift = new Vector2((Math.random() - 0.5) * 20, (Math.random() - 0.5) * 20)
+      this.asteroids.push({
+        pos: origin.add(new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)),
+        vel: outward.add(drift),
+        radius: VARIANT_RADII[variantKey],
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 2,
+        variantKey,
+      })
+    }
   }
 
   spawn(shipPos: Vector2, shipAngle: number): void {
-    const spawnAngle = shipAngle + (Math.random() - 0.5) * Math.PI * 1.2
-    const spawnDist = 180 + Math.random() * 60
-    const variantKey = VARIANTS[Math.floor(Math.random() * VARIANTS.length)]
-    this.asteroids.push({
-      pos: shipPos.add(new Vector2(Math.cos(spawnAngle) * spawnDist, Math.sin(spawnAngle) * spawnDist)),
-      vel: new Vector2((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40),
-      radius: VARIANT_RADII[variantKey],
-      rotation: Math.random() * Math.PI * 2,
-      rotSpeed: (Math.random() - 0.5) * 2,
-      variantKey,
-    })
+    const count = Math.random() < 0.4 ? 3 : 1
+    for (let i = 0; i < count; i++) {
+      const spawnAngle = shipAngle + (Math.random() - 0.5) * Math.PI * 1.4
+      const spawnDist = 180 + Math.random() * 80
+      const variantKey = VARIANT_POOL[Math.floor(Math.random() * VARIANT_POOL.length)]
+      this.asteroids.push({
+        pos: shipPos.add(new Vector2(Math.cos(spawnAngle) * spawnDist, Math.sin(spawnAngle) * spawnDist)),
+        vel: new Vector2((Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40),
+        radius: VARIANT_RADII[variantKey],
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 2,
+        variantKey,
+      })
+    }
   }
 
   checkCollision(bounds: AABB): AsteroidData | null {
@@ -60,7 +91,7 @@ export class AsteroidSystem {
   render(ctx: CanvasRenderingContext2D, camera: Camera): void {
     for (const a of this.asteroids) {
       const s = camera.worldToScreen(a.pos)
-      if (s.x < -50 || s.x > GAME_WIDTH + 50 || s.y < -50 || s.y > GAME_HEIGHT + 50) continue
+      if (s.x < -100 || s.x > GAME_WIDTH + 100 || s.y < -100 || s.y > GAME_HEIGHT + 100) continue
 
       ctx.save()
       ctx.translate(s.x, s.y)

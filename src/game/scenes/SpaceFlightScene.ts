@@ -40,6 +40,7 @@ export class SpaceFlightScene implements Scene {
   onEnter(): void {
     this.ship.pos = new Vector2(50, 0)
     this.camera.position = this.ship.pos.clone()
+    this.asteroids.populate(this.ship.pos, 40)
   }
 
   onResume(): void {
