@@ -13,6 +13,7 @@ import { AsteroidSystem } from '@game/entities/AsteroidSystem'
 import { WordleScene } from '@game/scenes/WordleScene'
 import { SidePlanetScene } from '@game/scenes/SidePlanetScene'
 import { GameOverScene } from '@game/scenes/GameOverScene'
+import { debugSettings } from '@game/data/debug'
 
 export class SpaceFlightScene implements Scene {
   private ship = new Ship()
@@ -105,6 +106,13 @@ export class SpaceFlightScene implements Scene {
     const sy = this.screenShake > 0 ? Math.round((Math.random() - 0.5) * 4) : 0
     ctx.save()
     ctx.translate(sx, sy)
+
+    const zoom = debugSettings.zoom
+    if (zoom !== 1) {
+      ctx.translate(GAME_WIDTH / 2, GAME_HEIGHT / 2)
+      ctx.scale(zoom, zoom)
+      ctx.translate(-GAME_WIDTH / 2, -GAME_HEIGHT / 2)
+    }
 
     ctx.fillStyle = '#070710'
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)

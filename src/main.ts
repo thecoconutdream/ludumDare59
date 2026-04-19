@@ -6,6 +6,7 @@ import { AssetLoader } from '@engine/assets/AssetLoader'
 import { MainMenuScene } from '@game/scenes/MainMenuScene'
 import { assetManifest } from '@game/data/assetManifest'
 import { FONT_SM } from '@game/data/ui'
+import '@game/data/debug'
 
 const container = document.getElementById('app')!
 
