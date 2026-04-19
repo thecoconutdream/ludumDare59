@@ -91,12 +91,14 @@ export class EscapeScene implements Scene {
     // Countdown
     this.countdown = Math.max(0, this.countdown - dt)
 
-    // Ship movement
+    // Ship movement — locked during grace period
     const thrust = Vector2.zero()
-    if (this.input.isHeld('up'))    thrust.y -= 1
-    if (this.input.isHeld('down'))  thrust.y += 1
-    if (this.input.isHeld('left'))  thrust.x -= 1
-    if (this.input.isHeld('right')) thrust.x += 1
+    if (this.graceTimer <= 0) {
+      if (this.input.isHeld('up'))    thrust.y -= 1
+      if (this.input.isHeld('down'))  thrust.y += 1
+      if (this.input.isHeld('left'))  thrust.x -= 1
+      if (this.input.isHeld('right')) thrust.x += 1
+    }
 
     if (thrust.magnitude() > 0) {
       const t = thrust.normalized().scale(this.THRUST * dt)

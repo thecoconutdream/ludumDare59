@@ -75,21 +75,21 @@ export class IntroScene implements Scene {
       return
     }
 
-    this.phaseTimer += dt
-
-    // Liftoff shake on last phase
+    // Liftoff phase plays out automatically once triggered
     if (this.phaseIndex === this.phases.length - 1) {
+      this.phaseTimer += dt
       const progress = this.phaseTimer / this.phases[this.phaseIndex].duration
       this.shakeY = progress > 0.4 ? (Math.random() - 0.5) * progress * 6 : 0
       this.fadeAlpha = Math.min(1, (progress - 0.6) / 0.4)
-    }
-
-    if (this.phaseTimer >= this.phases[this.phaseIndex].duration) {
-      this.phaseIndex++
-      this.phaseTimer = 0
-      if (this.phaseIndex >= this.phases.length) {
+      if (this.phaseTimer >= this.phases[this.phaseIndex].duration) {
         this.launch()
       }
+      return
+    }
+
+    if (this.input.isPressed('confirm')) {
+      this.phaseIndex++
+      this.phaseTimer = 0
     }
   }
 
@@ -146,7 +146,7 @@ export class IntroScene implements Scene {
     ctx.textAlign = 'right'
     ctx.fillStyle = '#556677'
     ctx.font = FONT_SM
-    ctx.fillText(`${this.phaseIndex + 1}/${this.phases.length} ESC`, GAME_WIDTH - 12, boxY + boxH - 4)
+    ctx.fillText(`${this.phaseIndex + 1}/${this.phases.length} ENTR`, GAME_WIDTH - 12, boxY + boxH - 4)
 
     ctx.restore()
 
