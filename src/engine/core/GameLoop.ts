@@ -36,13 +36,13 @@ export class GameLoop {
 
     while (this.accumulator >= FIXED_TIMESTEP) {
       this.scenes.update(FIXED_TIMESTEP)
+      this.input.flush()
       this.accumulator -= FIXED_TIMESTEP
     }
 
     this.renderer.clear()
     this.scenes.render(this.renderer.ctx)
 
-    this.input.flush()
     this.rafHandle = requestAnimationFrame(this.tick)
   }
 }
