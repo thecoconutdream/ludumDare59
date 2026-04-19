@@ -226,16 +226,19 @@ export class EscapeScene implements Scene {
       const angle = this.shipVel.magnitude() > 5
         ? Math.atan2(this.shipVel.y, this.shipVel.x)
         : 0
+      const SHIP_W = 64, SHIP_H = 48
+      const ANCHOR_X = 35, ANCHOR_Y = 32
+      const PLAYER_W = 32, PLAYER_H = 48, PLAYER_SCALE = 0.5
+      const dw = PLAYER_W * PLAYER_SCALE
+      const dh = PLAYER_H * PLAYER_SCALE
+      const dx = (ANCHOR_X - SHIP_W / 2) - dw / 2
+      const dy = (ANCHOR_Y - SHIP_H / 2) - dh + 4
+      const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
       ctx.save()
       ctx.translate(s.x, s.y)
       ctx.rotate(angle)
-      ctx.fillStyle = '#44ff88'
-      ctx.beginPath()
-      ctx.moveTo(10, 0)
-      ctx.lineTo(-8, -6)
-      ctx.lineTo(-8, 6)
-      ctx.closePath()
-      ctx.fill()
+      ctx.drawImage(this.assets.getImage('ship'), -SHIP_W / 2, -SHIP_H / 2)
+      ctx.drawImage(this.assets.getImage(charKey), 8 * PLAYER_W, 0, PLAYER_W, PLAYER_H, dx, dy, dw, dh)
       ctx.restore()
     }
 
