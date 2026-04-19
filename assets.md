@@ -23,8 +23,8 @@ Jeder Frame hat dieselbe Größe. Leere Felder am Ende einer Zeile werden leer g
 ### 1a. Katze — Basis-Sprite Sheet
 
 **Datei:** `sprites/player/cat_base.png`
-**Frame-Größe:** 16×24px
-**Sheet-Größe:** 128×144px (8 Spalten × 6 Zeilen)
+**Frame-Größe:** 32×48px
+**Sheet-Größe:** 256×288px (8 Spalten × 6 Zeilen)
 **Verwendung:** Intro-Szene (gehen), Pizzeria (idle), SuccessScene (feiern), EscapeScene (Cockpit)
 
 | Zeile | Animation | Frames | FPS | Was zu malen ist |
@@ -41,8 +41,8 @@ Jeder Frame hat dieselbe Größe. Leere Felder am Ende einer Zeile werden leer g
 ### 1b. Hund — Basis-Sprite Sheet
 
 **Datei:** `sprites/player/dog_base.png`
-**Frame-Größe:** 16×24px
-**Sheet-Größe:** 128×144px (8 Spalten × 6 Zeilen)
+**Frame-Größe:** 32×48px
+**Sheet-Größe:** 256×288px (8 Spalten × 6 Zeilen)
 **Verwendung:** identisch zu Katze
 
 Gleiche Zeilen / Animations-Struktur wie Katze (1a).
@@ -54,8 +54,8 @@ Visueller Unterschied: hängende Ohren, Schnauze, wedelnder Schwanz bei idle/wal
 
 Overlays werden pixelgenau über den Basis-Charakter gelegt. Selbe Frame-Größe und Sheet-Struktur wie 1a/1b, damit die Frames exakt übereinanderpassen.
 
-**Frame-Größe:** 16×24px
-**Sheet-Größe:** 128×144px (8 Spalten × 6 Zeilen)
+**Frame-Größe:** 32×48px
+**Sheet-Größe:** 256×288px (8 Spalten × 6 Zeilen)
 **Wichtig:** Transparenter Hintergrund. Nur der Outfit-Teil ist gezeichnet, alles andere transparent.
 
 | Datei | Slot | Item | Verwendung |
@@ -278,8 +278,8 @@ Sprite Sheets, taumelnde Animation.
 ### 8a. Pizzeria-Boss (NPC)
 
 **Datei:** `sprites/npc/pizza_boss.png`
-**Frame-Größe:** 16×24px
-**Sheet-Größe:** 80×24px (5 Frames × 1 Zeile)
+**Frame-Größe:** 32×48px
+**Sheet-Größe:** 160×48px (5 Frames × 1 Zeile)
 **Verwendung:** IntroScene — steht hinter dem Tresen
 
 | Frame | Was zu malen |
@@ -290,8 +290,8 @@ Sprite Sheets, taumelnde Animation.
 ### 8b. Mansion-Tür (Öffnungsanimation)
 
 **Datei:** `sprites/npc/mansion_door.png`
-**Frame-Größe:** 16×24px
-**Sheet-Größe:** 64×24px (4 Frames × 1 Zeile) · FPS: 8
+**Frame-Größe:** 32×48px
+**Sheet-Größe:** 128×48px (4 Frames × 1 Zeile) · FPS: 8
 **Verwendung:** SuccessScene — Tür öffnet sich nach erfolgreicher Lieferung, One-shot
 **Was zu malen:** Frame 0 = Tür geschlossen, Frame 3 = vollständig offen, drinnen helles Licht.
 

@@ -15,67 +15,67 @@ const C = {
 
 export const assetManifest: AssetDef[] = [
 
-  // ─── Characters ────────────────────────────────────────────────────────────
+  // ─── Characters — 32×48px frames, sheet 8 cols × 6 rows = 256×288px ───────
   {
     key: 'player_cat',
     path: 'sprites/player/cat_base.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.character, label: 'CAT',
   },
   {
     key: 'player_dog',
     path: 'sprites/player/dog_base.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.character, label: 'DOG',
   },
 
-  // ─── Outfit Overlays ───────────────────────────────────────────────────────
+  // ─── Outfit Overlays — same grid as base character (32×48, 256×288) ───────
   {
     key: 'outfit_hat_cap',
     path: 'sprites/outfits/hat_delivery_cap.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'HAT:CAP',
   },
   {
     key: 'outfit_hat_helmet',
     path: 'sprites/outfits/hat_space_helmet.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'HAT:HELM',
   },
   {
     key: 'outfit_hat_toque',
     path: 'sprites/outfits/hat_chef_toque.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'HAT:CHEF',
   },
   {
     key: 'outfit_hat_cowboy',
     path: 'sprites/outfits/hat_cowboy.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'HAT:COWB',
   },
   {
     key: 'outfit_body_jacket',
     path: 'sprites/outfits/body_delivery_jacket.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'BODY:JKT',
   },
   {
     key: 'outfit_body_bomber',
     path: 'sprites/outfits/body_bomber.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'BODY:BMB',
   },
   {
     key: 'outfit_body_spacesuit',
     path: 'sprites/outfits/body_spacesuit.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'BODY:SPC',
   },
   {
     key: 'outfit_body_chef',
     path: 'sprites/outfits/body_chef_coat.png',
-    width: 128, height: 144, frameWidth: 16, frameHeight: 24,
+    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.outfit, label: 'BODY:CHF',
   },
 
@@ -391,13 +391,13 @@ export const assetManifest: AssetDef[] = [
   {
     key: 'npc_pizza_boss',
     path: 'sprites/npc/pizza_boss.png',
-    width: 80, height: 24, frameWidth: 16, frameHeight: 24,
+    width: 160, height: 48, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.npc, label: 'BOSS',
   },
   {
     key: 'npc_mansion_door',
     path: 'sprites/npc/mansion_door.png',
-    width: 64, height: 24, frameWidth: 16, frameHeight: 24,
+    width: 128, height: 48, frameWidth: 32, frameHeight: 48,
     placeholderColor: C.npc, label: 'DOOR',
   },
 
