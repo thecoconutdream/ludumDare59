@@ -37,7 +37,7 @@ export class IntroScene implements Scene {
         duration: 3.5,
         bgKey: 'bg_pizzeria_interior',
         lines: ['"Hot order incoming!"', `"${name}, you\'re up!"`],
-        subLines: ['Boss slides the delivery slip across the counter.'],
+        subLines: ['Boss slides the slip across the counter.'],
       },
       {
         duration: 2.5,
@@ -114,7 +114,11 @@ export class IntroScene implements Scene {
     }
 
     // Dialog box
-    const boxH = phase.subLines ? 52 : 38
+    const lineH = 14
+    const subLineH = 12
+    const boxH = phase.subLines
+      ? 10 + phase.lines.length * lineH + 6 + phase.subLines.length * subLineH + 8
+      : 10 + phase.lines.length * lineH + 8
     const boxY = GAME_HEIGHT - boxH - 8
     ctx.fillStyle = '#000000cc'
     ctx.fillRect(8, boxY, GAME_WIDTH - 16, boxH)
@@ -124,24 +128,24 @@ export class IntroScene implements Scene {
 
     ctx.textAlign = 'left'
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 8px monospace'
+    ctx.font = '8px "Press Start 2P"'
     for (let i = 0; i < phase.lines.length; i++) {
-      ctx.fillText(phase.lines[i], 16, boxY + 14 + i * 12)
+      ctx.fillText(phase.lines[i], 16, boxY + 14 + i * 14)
     }
 
     if (phase.subLines) {
       ctx.fillStyle = '#aaaacc'
-      ctx.font = '6px monospace'
+      ctx.font = '8px "Press Start 2P"'
       for (let i = 0; i < phase.subLines.length; i++) {
-        ctx.fillText(phase.subLines[i], 16, boxY + 14 + phase.lines.length * 12 + 4 + i * 9)
+        ctx.fillText(phase.subLines[i], 16, boxY + 14 + phase.lines.length * 14 + 6 + i * 12)
       }
     }
 
     // Progress dots
     ctx.textAlign = 'right'
     ctx.fillStyle = '#556677'
-    ctx.font = '6px monospace'
-    ctx.fillText(`${this.phaseIndex + 1}/${this.phases.length}  [ESC skip]`, GAME_WIDTH - 12, boxY + boxH - 4)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText(`${this.phaseIndex + 1}/${this.phases.length} ESC`, GAME_WIDTH - 12, boxY + boxH - 4)
 
     ctx.restore()
 
@@ -185,13 +189,13 @@ export class IntroScene implements Scene {
     ctx.fillStyle = '#1a1a1a'
     ctx.fillRect(220, 20, 80, 60)
     ctx.fillStyle = '#ff8833'
-    ctx.font = '5px monospace'
+    ctx.font = '8px "Press Start 2P"'
     ctx.textAlign = 'left'
-    ctx.fillText('COSMIC MENU', 225, 32)
+    ctx.fillText('MENU', 225, 32)
     ctx.fillStyle = '#888866'
-    ctx.fillText('Asteroid Pizza  8⊕', 225, 44)
-    ctx.fillText('Black Hole Sub  12⊕', 225, 53)
-    ctx.fillText('Nebula Wings    6⊕', 225, 62)
+    ctx.fillText('AstPizza 8c', 225, 44, 72)
+    ctx.fillText('BH Sub  12c', 225, 55, 72)
+    ctx.fillText('Wings    6c', 225, 66, 72)
     // Boss placeholder
     ctx.fillStyle = '#ff8833'
     ctx.fillRect(150, 60, 20, 40)
@@ -212,10 +216,10 @@ export class IntroScene implements Scene {
     ctx.fillStyle = '#2a1a0a'
     ctx.fillRect(10, 50, 100, 70)
     ctx.fillStyle = '#ff6b35'
-    ctx.font = 'bold 7px monospace'
+    ctx.font = '8px "Press Start 2P"'
     ctx.textAlign = 'center'
-    ctx.fillText('COSMIC', 60, 75)
-    ctx.fillText('PIZZA', 60, 85)
+    ctx.fillText('COSMIC', 60, 76)
+    ctx.fillText('PIZZA', 60, 87)
     // Neon sign glow
     ctx.shadowColor = '#ff6b35'
     ctx.shadowBlur = 8

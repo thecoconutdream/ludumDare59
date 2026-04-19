@@ -32,21 +32,20 @@ export class GameOverScene implements Scene {
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
     ctx.fillStyle = '#cc2222'
-    ctx.font = 'bold 20px monospace'
+    ctx.font = '16px "Press Start 2P"'
     ctx.textAlign = 'center'
     ctx.fillText('GAME OVER', GAME_WIDTH / 2, 70)
 
     ctx.fillStyle = '#888899'
-    ctx.font = '8px monospace'
-    ctx.fillText('You were hit.', GAME_WIDTH / 2, 92)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText('You were hit.', GAME_WIDTH / 2, 94)
 
     ctx.fillStyle = '#ffcc00'
-    ctx.font = '7px monospace'
-    ctx.fillText(`Deliveries completed: ${gameState.deliveryCount}`, GAME_WIDTH / 2, 110)
+    ctx.fillText(`Deliveries: ${gameState.deliveryCount}`, GAME_WIDTH / 2, 112)
 
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffffff'
-      ctx.fillText('PRESS ENTER TO TRY AGAIN', GAME_WIDTH / 2, 140)
+      ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, 140)
     }
   }
 }

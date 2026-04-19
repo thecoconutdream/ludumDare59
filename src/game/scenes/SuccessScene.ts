@@ -74,36 +74,34 @@ export class SuccessScene implements Scene {
     ctx.textAlign = 'center'
 
     ctx.fillStyle = '#44ff88'
-    ctx.font = 'bold 14px monospace'
-    ctx.fillText('DELIVERY CONFIRMED!', GAME_WIDTH / 2, 55)
+    ctx.font = '16px "Press Start 2P"'
+    ctx.fillText('DELIVERED!', GAME_WIDTH / 2, 55)
 
     ctx.fillStyle = '#aaffcc'
-    ctx.font = '7px monospace'
-    ctx.fillText(`Delivery #${gameState.deliveryCount} complete`, GAME_WIDTH / 2, 72)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText(`Delivery #${gameState.deliveryCount}`, GAME_WIDTH / 2, 72)
 
     if (this.phase === 'outfit' && this.newOutfit) {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = 'bold 9px monospace'
-      ctx.fillText('NEW OUTFIT UNLOCKED!', GAME_WIDTH / 2, 100)
+      ctx.font = '8px "Press Start 2P"'
+      ctx.fillText('NEW OUTFIT!', GAME_WIDTH / 2, 100)
 
       ctx.fillStyle = '#ffffff'
-      ctx.font = '8px monospace'
-      ctx.fillText(this.newOutfit, GAME_WIDTH / 2, 116)
+      ctx.fillText(this.newOutfit, GAME_WIDTH / 2, 114)
 
       // Outfit preview box
       ctx.strokeStyle = '#ffcc00'
       ctx.lineWidth = 1
-      ctx.strokeRect(GAME_WIDTH / 2 - 20, 122, 40, 30)
+      ctx.strokeRect(GAME_WIDTH / 2 - 20, 120, 40, 30)
       ctx.fillStyle = '#ffcc0022'
-      ctx.fillRect(GAME_WIDTH / 2 - 20, 122, 40, 30)
+      ctx.fillRect(GAME_WIDTH / 2 - 20, 120, 40, 30)
       ctx.fillStyle = '#ffcc00'
-      ctx.font = '6px monospace'
-      ctx.fillText('✦ NEW ✦', GAME_WIDTH / 2, 140)
+      ctx.fillText('* NEW *', GAME_WIDTH / 2, 138)
     }
 
     ctx.fillStyle = '#666688'
-    ctx.font = '6px monospace'
-    ctx.fillText('PRESS ENTER for next delivery', GAME_WIDTH / 2, GAME_HEIGHT - 10)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, GAME_HEIGHT - 10)
   }
 
   private spawnParticles(): void {

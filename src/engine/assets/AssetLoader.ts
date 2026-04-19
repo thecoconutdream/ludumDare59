@@ -88,11 +88,11 @@ function generatePlaceholder(def: AssetDef): HTMLImageElement {
     }
   }
 
-  // Label — scale font to fit, minimum 5px
-  const maxFontSize = Math.min(10, def.width / (def.label.length * 0.7), def.height * 0.4)
-  const fontSize = Math.max(5, Math.floor(maxFontSize))
+  // Label — scale font to fit, minimum 8px
+  const maxFontSize = Math.min(8, def.width / (def.label.length * 0.7), def.height * 0.4)
+  const fontSize = Math.max(8, Math.floor(maxFontSize))
   ctx.fillStyle = '#ffffff'
-  ctx.font = `${fontSize}px monospace`
+  ctx.font = `${fontSize}px "Press Start 2P", monospace`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   const cx = def.frameWidth ? def.frameWidth / 2 : def.width / 2

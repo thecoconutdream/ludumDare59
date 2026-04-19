@@ -230,25 +230,24 @@ export class EscapeScene implements Scene {
     const secs = Math.ceil(this.countdown)
     const urgent = secs <= 3
     ctx.fillStyle = urgent ? '#ff2222' : '#ff8800'
-    ctx.font = `bold ${urgent ? 16 : 12}px monospace`
+    ctx.font = `${urgent ? 16 : 8}px "Press Start 2P"`
     ctx.fillText(`${secs}`, GAME_WIDTH / 2, 16)
 
     ctx.fillStyle = '#aaaacc'
-    ctx.font = '6px monospace'
-    ctx.fillText('ESCAPE NOW!', GAME_WIDTH / 2, 26)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText('ESCAPE NOW!', GAME_WIDTH / 2, 28)
 
     if (this.escaped) {
       ctx.fillStyle = '#44ff88'
-      ctx.font = 'bold 10px monospace'
+      ctx.font = '8px "Press Start 2P"'
       ctx.fillText('ESCAPED!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
-      ctx.font = '7px monospace'
       ctx.fillStyle = '#aaffcc'
-      ctx.fillText('New delivery address incoming...', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 14)
+      ctx.fillText('New address incoming...', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 14)
     }
 
     if (this.hit) {
       ctx.fillStyle = '#ff4444'
-      ctx.font = 'bold 12px monospace'
+      ctx.font = '8px "Press Start 2P"'
       ctx.fillText('DIRECT HIT!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
     }
   }

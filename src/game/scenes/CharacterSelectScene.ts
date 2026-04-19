@@ -6,8 +6,8 @@ import { gameState, CharacterType } from '@game/data/GameState'
 import { IntroScene } from '@game/scenes/IntroScene'
 
 const CHARACTERS: Array<{ type: CharacterType; label: string; desc: string; color: string }> = [
-  { type: 'cat', label: 'FELINAX',  desc: 'Hyper-intelligent\ncat breed.\nSpeed bonus.', color: '#ff8844' },
-  { type: 'dog', label: 'CANINUS',  desc: 'Hyper-intelligent\ndog breed.\nStronger shield.', color: '#4488ff' },
+  { type: 'cat', label: 'FELINAX',  desc: 'Clever cat.\nSpeed bonus.', color: '#ff8844' },
+  { type: 'dog', label: 'CANINUS',  desc: 'Brave dog.\nShield bonus.', color: '#4488ff' },
 ]
 
 export class CharacterSelectScene implements Scene {
@@ -40,13 +40,13 @@ export class CharacterSelectScene implements Scene {
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 10px monospace'
+    ctx.font = '8px "Press Start 2P"'
     ctx.textAlign = 'center'
     ctx.fillText('CHOOSE YOUR BREED', GAME_WIDTH / 2, 22)
 
     ctx.fillStyle = '#556677'
-    ctx.font = '6px monospace'
-    ctx.fillText('← → to select  |  ENTER to confirm', GAME_WIDTH / 2, 32)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText('< > PICK   ENTER GO', GAME_WIDTH / 2, 34)
 
     for (let i = 0; i < CHARACTERS.length; i++) {
       const ch = CHARACTERS[i]
@@ -68,33 +68,33 @@ export class CharacterSelectScene implements Scene {
       ctx.fillStyle = ch.color + (isSelected ? 'cc' : '55')
       ctx.fillRect(cx - 16, cardY + 8, 32, 40)
       ctx.fillStyle = '#ffffff'
-      ctx.font = '8px monospace'
+      ctx.font = '24px sans-serif'
       ctx.textAlign = 'center'
-      ctx.fillText(ch.type === 'cat' ? '🐱' : '🐶', cx, cardY + 34)
+      ctx.fillText(ch.type === 'cat' ? '🐱' : '🐶', cx, cardY + 37)
 
       // Name
       ctx.fillStyle = isSelected ? ch.color : '#aaaacc'
-      ctx.font = `bold 8px monospace`
-      ctx.fillText(ch.label, cx, cardY + 58)
+      ctx.font = '8px "Press Start 2P"'
+      ctx.fillText(ch.label, cx, cardY + 60)
 
       // Description
       ctx.fillStyle = '#889aaa'
-      ctx.font = '5px monospace'
+      ctx.font = '8px "Press Start 2P"'
       const lines = ch.desc.split('\n')
       for (let l = 0; l < lines.length; l++) {
-        ctx.fillText(lines[l], cx, cardY + 70 + l * 9)
+        ctx.fillText(lines[l], cx, cardY + 74 + l * 12)
       }
 
       // Selected indicator
       if (isSelected && Math.sin(this.blink * 4) > 0) {
         ctx.fillStyle = ch.color
-        ctx.fillText('▲', cx, cardY + 108)
+        ctx.fillText('^', cx, cardY + 108)
       }
     }
 
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = '7px monospace'
+      ctx.font = '8px "Press Start 2P"'
       ctx.textAlign = 'center'
       ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, GAME_HEIGHT - 10)
     }

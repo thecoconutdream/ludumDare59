@@ -22,6 +22,8 @@ const input = new InputManager({
 const assets = new AssetLoader()
 
 async function boot() {
+  await document.fonts.load('8px "Press Start 2P"')
+
   assets.loadManifest(assetManifest)
 
   await assets.waitAll((loaded, total) => {
@@ -31,7 +33,7 @@ async function boot() {
     ctx.fillStyle = '#0a0a1a'
     ctx.fillRect(0, 0, 320, 180)
     ctx.fillStyle = '#ffffff'
-    ctx.font = '8px monospace'
+    ctx.font = '8px "Press Start 2P"'
     ctx.textAlign = 'center'
     ctx.fillText('LOADING...', 160, 85)
     const barW = Math.floor((loaded / total) * 200)

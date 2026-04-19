@@ -58,7 +58,7 @@ const GRID_Y = 14
 const KB_ROWS = [
   ['Q','W','E','R','T','Y','U','I','O','P'],
   ['A','S','D','F','G','H','J','K','L'],
-  ['↵','Z','X','C','V','B','N','M','⌫'],
+  ['OK','Z','X','C','V','B','N','M','<'],
 ]
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
@@ -119,7 +119,7 @@ export class WordleScene implements Scene {
 
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ffcc00'
-    ctx.font = 'bold 8px monospace'
+    ctx.font = '8px "Press Start 2P"'
     ctx.fillText('DECRYPT THE PASSWORD', GAME_WIDTH / 2, 10)
 
     this.renderGrid(ctx)
@@ -127,23 +127,27 @@ export class WordleScene implements Scene {
 
     if (this.flashTimer > 0) {
       ctx.fillStyle = '#ff6644'
-      ctx.font = '7px monospace'
+      ctx.font = '8px "Press Start 2P"'
       ctx.textAlign = 'center'
-      ctx.fillText(this.flashMsg, GAME_WIDTH / 2, GRID_Y + MAX_ATTEMPTS * (CELL + GAP) + 4)
+      ctx.fillText(this.flashMsg, GAME_WIDTH / 2, GRID_Y + MAX_ATTEMPTS * (CELL + GAP) + 6)
     }
 
-    if (this.result === 'won') {
-      ctx.fillStyle = '#44ff88'
-      ctx.font = 'bold 10px monospace'
-      ctx.fillText('ACCESS GRANTED!', GAME_WIDTH / 2, GAME_HEIGHT - 20)
-    }
-    if (this.result === 'lost') {
-      ctx.fillStyle = '#ff4444'
-      ctx.font = 'bold 9px monospace'
-      ctx.fillText('ACCESS DENIED!', GAME_WIDTH / 2, GAME_HEIGHT - 26)
-      ctx.fillStyle = '#aaaacc'
-      ctx.font = '6px monospace'
-      ctx.fillText(`Word was: ${ANSWER}`, GAME_WIDTH / 2, GAME_HEIGHT - 14)
+    if (this.result !== 'playing') {
+      ctx.fillStyle = 'rgba(0,0,0,0.75)'
+      ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
+      if (this.result === 'won') {
+        ctx.fillStyle = '#44ff88'
+        ctx.font = '8px "Press Start 2P"'
+        ctx.textAlign = 'center'
+        ctx.fillText('ACCESS GRANTED!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
+      } else {
+        ctx.fillStyle = '#ff4444'
+        ctx.font = '8px "Press Start 2P"'
+        ctx.textAlign = 'center'
+        ctx.fillText('ACCESS DENIED!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 8)
+        ctx.fillStyle = '#aaaacc'
+        ctx.fillText(`WORD: ${ANSWER}`, GAME_WIDTH / 2, GAME_HEIGHT / 2 + 10)
+      }
     }
   }
 
@@ -176,9 +180,9 @@ export class WordleScene implements Scene {
 
         if (letter) {
           ctx.fillStyle = '#ffffff'
-          ctx.font = 'bold 9px monospace'
+          ctx.font = '8px "Press Start 2P"'
           ctx.textAlign = 'center'
-          ctx.fillText(letter, x + CELL / 2, y + CELL - 3)
+          ctx.fillText(letter, x + CELL / 2, y + CELL - 4)
         }
       }
     }
@@ -186,19 +190,22 @@ export class WordleScene implements Scene {
 
   private renderKeyboard(ctx: CanvasRenderingContext2D): void {
     const keyStates = this.buildKeyStates()
-    const KW = 11
-    const KH = 10
+    const KW = 14
+    const KH = 12
     const kbY = GRID_Y + MAX_ATTEMPTS * (CELL + GAP) + 8
 
     for (let row = 0; row < KB_ROWS.length; row++) {
       const keys = KB_ROWS[row]
-      const rowW = keys.length * (KW + 1) - 1
+      const rowW = keys.reduce((sum, k) => sum + (k.length > 1 ? KW + 8 : KW) + 1, -1)
       const startX = Math.floor(GAME_WIDTH / 2 - rowW / 2)
 
+      let offsetX = 0
       for (let col = 0; col < keys.length; col++) {
         const key = keys[col]
-        const x = startX + col * (KW + 1)
+        const kw = key.length > 1 ? KW + 8 : KW
+        const x = startX + offsetX
         const y = kbY + row * (KH + 2)
+        offsetX += kw + 1
 
         const state = keyStates[key]
         let bg = '#2a2a3e'
@@ -207,11 +214,11 @@ export class WordleScene implements Scene {
         else if (state === 'absent') bg = '#111111'
 
         ctx.fillStyle = bg
-        ctx.fillRect(x, y, KW, KH)
+        ctx.fillRect(x, y, kw, KH)
         ctx.fillStyle = '#ccccdd'
-        ctx.font = '5px monospace'
+        ctx.font = '8px "Press Start 2P"'
         ctx.textAlign = 'center'
-        ctx.fillText(key, x + KW / 2, y + KH - 2)
+        ctx.fillText(key, x + kw / 2, y + KH - 2)
       }
     }
   }
@@ -231,9 +238,9 @@ export class WordleScene implements Scene {
   private handleKey(key: string): void {
     if (this.result !== 'playing') return
 
-    if (key === 'Backspace') {
+    if (key === 'Backspace' || key === '<') {
       this.currentInput = this.currentInput.slice(0, -1)
-    } else if (key === 'Enter') {
+    } else if (key === 'Enter' || key === 'OK') {
       this.submit()
     } else if (/^[A-Za-z]$/.test(key) && this.currentInput.length < WORD_LENGTH) {
       this.currentInput += key.toUpperCase()

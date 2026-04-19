@@ -348,7 +348,7 @@ export class SpaceFlightScene implements Scene {
     // Label
     if (planet.type !== 'dead') {
       ctx.fillStyle = planet.type === 'client' ? '#ffcc00' : '#aaaacc'
-      ctx.font = '5px monospace'
+      ctx.font = '8px "Press Start 2P"'
       ctx.textAlign = 'center'
       ctx.fillText(planet.label, s.x, s.y + planet.radius + 8)
     }
@@ -417,27 +417,27 @@ export class SpaceFlightScene implements Scene {
       const speed = this.ship.vel.magnitude()
       const eta = speed > 5 ? Math.ceil(dist / speed) : '?'
       ctx.fillStyle = '#44ff88'
-      ctx.font = '5px monospace'
+      ctx.font = '8px "Press Start 2P"'
       ctx.textAlign = 'right'
       ctx.fillText(`ETA ${eta}s`, GAME_WIDTH - 4, cy + 18)
     }
 
     // Distance
     ctx.fillStyle = '#aaaacc'
-    ctx.font = '5px monospace'
+    ctx.font = '8px "Press Start 2P"'
     ctx.textAlign = 'right'
     ctx.fillText(`${dist}u`, GAME_WIDTH - 4, cy + 12)
 
     // Delivery badge — top-left
     ctx.fillStyle = '#ffcc00'
-    ctx.font = '6px monospace'
+    ctx.font = '8px "Press Start 2P"'
     ctx.textAlign = 'left'
     ctx.fillText(`DELIVERY #${gameState.deliveryCount + 1}`, 4, 10)
 
     // Active upgrade icons
     let iconX = 4
     const iconY = 18
-    ctx.font = '5px monospace'
+    ctx.font = '8px "Press Start 2P"'
     if (gameState.upgrades.hyperdrive)      { ctx.fillStyle = '#4488ff'; ctx.fillText('BOOST', iconX, iconY); iconX += 28 }
     if (gameState.upgrades.thrusterDamaged) { ctx.fillStyle = '#ff8800'; ctx.fillText('DMGD',  iconX, iconY); iconX += 24 }
     if (gameState.upgrades.shield)          { ctx.fillStyle = '#44aaff'; ctx.fillText('SHLD',  iconX, iconY); iconX += 24 }
@@ -449,15 +449,15 @@ export class SpaceFlightScene implements Scene {
       ctx.textAlign = 'center'
       if (this.nearbyPlanet.type === 'client') {
         ctx.fillStyle = '#ffcc00'
-        ctx.font = '7px monospace'
+        ctx.font = '8px "Press Start 2P"'
         ctx.fillText('[ENTER] APPROACH PLANET', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       } else if (this.nearbyPlanet.type === 'side' && !isVisited) {
         ctx.fillStyle = '#44aaff'
-        ctx.font = '7px monospace'
+        ctx.font = '8px "Press Start 2P"'
         ctx.fillText('[E] LAND', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       } else if (isVisited) {
         ctx.fillStyle = '#556677'
-        ctx.font = '6px monospace'
+        ctx.font = '8px "Press Start 2P"'
         ctx.fillText('(already explored)', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       }
     }

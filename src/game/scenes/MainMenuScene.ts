@@ -53,24 +53,24 @@ export class MainMenuScene implements Scene {
     // Title
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ff6b35'
-    ctx.font = 'bold 16px monospace'
+    ctx.font = '16px "Press Start 2P"'
     ctx.fillText('SPACE PIZZA', GAME_WIDTH / 2, 60)
     ctx.fillStyle = '#ffcc00'
-    ctx.font = 'bold 11px monospace'
-    ctx.fillText('DELIVERY', GAME_WIDTH / 2, 76)
+    ctx.font = '16px "Press Start 2P"'
+    ctx.fillText('DELIVERY', GAME_WIDTH / 2, 80)
 
     ctx.fillStyle = '#aaaacc'
-    ctx.font = '6px monospace'
-    ctx.fillText('by a very smart cat or dog', GAME_WIDTH / 2, 92)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText('a cat or dog in space', GAME_WIDTH / 2, 100)
 
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = '8px monospace'
-      ctx.fillText('PRESS ENTER TO START', GAME_WIDTH / 2, 125)
+      ctx.font = '8px "Press Start 2P"'
+      ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, 128)
     }
 
     ctx.fillStyle = '#334455'
-    ctx.font = '5px monospace'
-    ctx.fillText('ludum dare 59', GAME_WIDTH / 2, GAME_HEIGHT - 6)
+    ctx.font = '8px "Press Start 2P"'
+    ctx.fillText('LUDUM DARE 59', GAME_WIDTH / 2, GAME_HEIGHT - 8)
   }
 }
