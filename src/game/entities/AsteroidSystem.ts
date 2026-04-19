@@ -77,9 +77,10 @@ export class AsteroidSystem {
   }
 
   checkCollision(bounds: AABB): AsteroidData | null {
+    const shipCenter = bounds.center
+    const shipRadius = Math.min(bounds.width, bounds.height) / 2
     for (const a of this.asteroids) {
-      const ab = new AABB(a.pos.x - a.radius, a.pos.y - a.radius, a.radius * 2, a.radius * 2)
-      if (bounds.intersects(ab)) return a
+      if (shipCenter.distanceTo(a.pos) < a.radius + shipRadius) return a
     }
     return null
   }
