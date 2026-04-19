@@ -3,6 +3,7 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
+import { FONT_SM, FONT_LG } from '@game/data/ui'
 import { SpaceFlightScene } from '@game/scenes/SpaceFlightScene'
 
 const OUTFIT_NAMES = [
@@ -74,16 +75,16 @@ export class SuccessScene implements Scene {
     ctx.textAlign = 'center'
 
     ctx.fillStyle = '#44ff88'
-    ctx.font = '16px "Press Start 2P"'
+    ctx.font = FONT_LG
     ctx.fillText('DELIVERED!', GAME_WIDTH / 2, 55)
 
     ctx.fillStyle = '#aaffcc'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText(`Delivery #${gameState.deliveryCount}`, GAME_WIDTH / 2, 72)
 
     if (this.phase === 'outfit' && this.newOutfit) {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('NEW OUTFIT!', GAME_WIDTH / 2, 100)
 
       ctx.fillStyle = '#ffffff'
@@ -100,7 +101,7 @@ export class SuccessScene implements Scene {
     }
 
     ctx.fillStyle = '#666688'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, GAME_HEIGHT - 10)
   }
 

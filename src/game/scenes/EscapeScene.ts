@@ -3,6 +3,7 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { Vector2 } from '@engine/physics/Vector2'
+import { FONT_SM, FONT_LG } from '@game/data/ui'
 import { AABB } from '@engine/physics/AABB'
 import { gameState } from '@game/data/GameState'
 import { SpaceFlightScene } from '@game/scenes/SpaceFlightScene'
@@ -230,16 +231,16 @@ export class EscapeScene implements Scene {
     const secs = Math.ceil(this.countdown)
     const urgent = secs <= 3
     ctx.fillStyle = urgent ? '#ff2222' : '#ff8800'
-    ctx.font = `${urgent ? 16 : 8}px "Press Start 2P"`
+    ctx.font = urgent ? FONT_LG : FONT_SM
     ctx.fillText(`${secs}`, GAME_WIDTH / 2, 16)
 
     ctx.fillStyle = '#aaaacc'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText('ESCAPE NOW!', GAME_WIDTH / 2, 28)
 
     if (this.escaped) {
       ctx.fillStyle = '#44ff88'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('ESCAPED!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
       ctx.fillStyle = '#aaffcc'
       ctx.fillText('New address incoming...', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 14)
@@ -247,7 +248,7 @@ export class EscapeScene implements Scene {
 
     if (this.hit) {
       ctx.fillStyle = '#ff4444'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('DIRECT HIT!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
     }
   }

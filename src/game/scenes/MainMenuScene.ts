@@ -2,6 +2,7 @@ import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
+import { FONT_SM, FONT_LG } from '@game/data/ui'
 import { CharacterSelectScene } from '@game/scenes/CharacterSelectScene'
 
 export class MainMenuScene implements Scene {
@@ -53,24 +54,24 @@ export class MainMenuScene implements Scene {
     // Title
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ff6b35'
-    ctx.font = '16px "Press Start 2P"'
+    ctx.font = FONT_LG
     ctx.fillText('SPACE PIZZA', GAME_WIDTH / 2, 60)
     ctx.fillStyle = '#ffcc00'
-    ctx.font = '16px "Press Start 2P"'
+    ctx.font = FONT_LG
     ctx.fillText('DELIVERY', GAME_WIDTH / 2, 80)
 
     ctx.fillStyle = '#aaaacc'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText('a cat or dog in space', GAME_WIDTH / 2, 100)
 
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, 128)
     }
 
     ctx.fillStyle = '#334455'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText('LUDUM DARE 59', GAME_WIDTH / 2, GAME_HEIGHT - 8)
   }
 }

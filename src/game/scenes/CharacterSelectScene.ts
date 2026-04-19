@@ -3,6 +3,7 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState, CharacterType } from '@game/data/GameState'
+import { FONT_SM } from '@game/data/ui'
 import { IntroScene } from '@game/scenes/IntroScene'
 
 const CHARACTERS: Array<{ type: CharacterType; label: string; desc: string; color: string }> = [
@@ -40,12 +41,12 @@ export class CharacterSelectScene implements Scene {
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
     ctx.fillStyle = '#ffffff'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.textAlign = 'center'
     ctx.fillText('CHOOSE YOUR BREED', GAME_WIDTH / 2, 22)
 
     ctx.fillStyle = '#556677'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText('< > PICK   ENTER GO', GAME_WIDTH / 2, 34)
 
     for (let i = 0; i < CHARACTERS.length; i++) {
@@ -74,12 +75,12 @@ export class CharacterSelectScene implements Scene {
 
       // Name
       ctx.fillStyle = isSelected ? ch.color : '#aaaacc'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText(ch.label, cx, cardY + 60)
 
       // Description
       ctx.fillStyle = '#889aaa'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       const lines = ch.desc.split('\n')
       for (let l = 0; l < lines.length; l++) {
         ctx.fillText(lines[l], cx, cardY + 74 + l * 12)
@@ -94,7 +95,7 @@ export class CharacterSelectScene implements Scene {
 
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.textAlign = 'center'
       ctx.fillText('PRESS ENTER', GAME_WIDTH / 2, GAME_HEIGHT - 10)
     }

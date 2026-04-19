@@ -3,6 +3,7 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
+import { FONT_SM, FONT_LG } from '@game/data/ui'
 
 export class GameOverScene implements Scene {
   private blink = 0
@@ -32,12 +33,12 @@ export class GameOverScene implements Scene {
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
 
     ctx.fillStyle = '#cc2222'
-    ctx.font = '16px "Press Start 2P"'
+    ctx.font = FONT_LG
     ctx.textAlign = 'center'
     ctx.fillText('GAME OVER', GAME_WIDTH / 2, 70)
 
     ctx.fillStyle = '#888899'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText('You were hit.', GAME_WIDTH / 2, 94)
 
     ctx.fillStyle = '#ffcc00'

@@ -1,10 +1,11 @@
 import { GameLoop } from '@engine/core/GameLoop'
 import { SceneManager } from '@engine/core/SceneManager'
-import { Renderer } from '@engine/rendering/Renderer'
+import { GAME_HEIGHT, GAME_WIDTH, Renderer } from '@engine/rendering/Renderer'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { MainMenuScene } from '@game/scenes/MainMenuScene'
 import { assetManifest } from '@game/data/assetManifest'
+import { FONT_SM } from '@game/data/ui'
 
 const container = document.getElementById('app')!
 
@@ -22,7 +23,7 @@ const input = new InputManager({
 const assets = new AssetLoader()
 
 async function boot() {
-  await document.fonts.load('8px "Press Start 2P"')
+  await document.fonts.load(FONT_SM)
 
   assets.loadManifest(assetManifest)
 
@@ -31,9 +32,9 @@ async function boot() {
     const ctx = renderer.ctx
     renderer.clear()
     ctx.fillStyle = '#0a0a1a'
-    ctx.fillRect(0, 0, 320, 180)
+    ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
     ctx.fillStyle = '#ffffff'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.textAlign = 'center'
     ctx.fillText('LOADING...', 160, 85)
     const barW = Math.floor((loaded / total) * 200)

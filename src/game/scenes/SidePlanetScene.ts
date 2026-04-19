@@ -3,6 +3,7 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState, Biome, Loot } from '@game/data/GameState'
+import { FONT_SM } from '@game/data/ui'
 
 const BIOME_COLORS: Record<Biome, string> = {
   ice:    '#aaddff',
@@ -91,18 +92,18 @@ export class SidePlanetScene implements Scene {
     // Biome label
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ffffff'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText(BIOME_LABELS[this.biome], GAME_WIDTH / 2, 20)
 
     if (this.phase === 'landing') {
       ctx.fillStyle = '#aaaacc'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('Landing...', GAME_WIDTH / 2, GAME_HEIGHT / 2)
     }
 
     if (this.phase === 'exploring') {
       ctx.fillStyle = '#aaaacc'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('Exploring...', GAME_WIDTH / 2, GAME_HEIGHT / 2)
     }
 
@@ -133,30 +134,30 @@ export class SidePlanetScene implements Scene {
 
     if (this.loot === 'empty') {
       ctx.fillStyle = '#556677'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('Nothing here...', cx, py + 25)
       ctx.fillStyle = '#aaaacc'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('(Just a barren planet)', cx, py + 38)
     } else if (this.loot === 'outfit') {
       ctx.fillStyle = '#ffcc00'
-      ctx.font = 'bold 8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('OUTFIT PIECE FOUND!', cx, py + 22)
       ctx.fillStyle = '#ffffff'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText(this.lootLabel, cx, py + 36)
     } else {
       ctx.fillStyle = '#4488ff'
-      ctx.font = 'bold 8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('SHIP UPGRADE!', cx, py + 22)
       ctx.fillStyle = '#ffffff'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText(this.lootLabel, cx, py + 36, 150)
     }
 
     if (Math.sin(this.blink * 4) > 0) {
       ctx.fillStyle = '#aaaacc'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.fillText('PRESS ENTER to leave', cx, py + 56)
     }
   }

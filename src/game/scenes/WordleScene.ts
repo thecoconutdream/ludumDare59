@@ -3,51 +3,13 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
+import { FONT_SM } from '@game/data/ui'
+import { WORD_LENGTH, MAX_ATTEMPTS, LetterState, GuessResult, checkGuess } from '@game/data/wordleLogic'
 import { SuccessScene } from '@game/scenes/SuccessScene'
 import { EscapeScene } from '@game/scenes/EscapeScene'
 
-// ─── Wordle Logic ─────────────────────────────────────────────────────────────
 // TODO(colleague): Replace ANSWER with random word from wordList.ts
-//                 Extend checkGuess for full duplicate-letter edge cases
-
-export type LetterState = 'correct' | 'present' | 'absent'
-
-export interface GuessResult {
-  letter: string
-  state: LetterState
-}
-
-const WORD_LENGTH = 5
-const MAX_ATTEMPTS = 6
-export const ANSWER = 'PIZZA' // TODO: replace with random word from wordList
-
-export function checkGuess(guess: string, answer: string): GuessResult[] {
-  const result: GuessResult[] = Array(WORD_LENGTH).fill(null).map((_, i) => ({
-    letter: guess[i],
-    state: 'absent' as LetterState,
-  }))
-  const used = new Array(WORD_LENGTH).fill(false)
-
-  // Pass 1: correct positions
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    if (guess[i] === answer[i]) {
-      result[i].state = 'correct'
-      used[i] = true
-    }
-  }
-
-  // Pass 2: present but wrong position
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    if (result[i].state === 'correct') continue
-    const j = answer.split('').findIndex((c, k) => c === guess[i] && !used[k])
-    if (j !== -1) {
-      result[i].state = 'present'
-      used[j] = true
-    }
-  }
-
-  return result
-}
+export const ANSWER = 'PIZZA'
 
 // ─── Layout constants ─────────────────────────────────────────────────────────
 const CELL = 16
@@ -119,7 +81,7 @@ export class WordleScene implements Scene {
 
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ffcc00'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText('DECRYPT THE PASSWORD', GAME_WIDTH / 2, 10)
 
     this.renderGrid(ctx)
@@ -127,7 +89,7 @@ export class WordleScene implements Scene {
 
     if (this.flashTimer > 0) {
       ctx.fillStyle = '#ff6644'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       ctx.textAlign = 'center'
       ctx.fillText(this.flashMsg, GAME_WIDTH / 2, GRID_Y + MAX_ATTEMPTS * (CELL + GAP) + 6)
     }
@@ -137,12 +99,12 @@ export class WordleScene implements Scene {
       ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
       if (this.result === 'won') {
         ctx.fillStyle = '#44ff88'
-        ctx.font = '8px "Press Start 2P"'
+        ctx.font = FONT_SM
         ctx.textAlign = 'center'
         ctx.fillText('ACCESS GRANTED!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
       } else {
         ctx.fillStyle = '#ff4444'
-        ctx.font = '8px "Press Start 2P"'
+        ctx.font = FONT_SM
         ctx.textAlign = 'center'
         ctx.fillText('ACCESS DENIED!', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 8)
         ctx.fillStyle = '#aaaacc'
@@ -180,7 +142,7 @@ export class WordleScene implements Scene {
 
         if (letter) {
           ctx.fillStyle = '#ffffff'
-          ctx.font = '8px "Press Start 2P"'
+          ctx.font = FONT_SM
           ctx.textAlign = 'center'
           ctx.fillText(letter, x + CELL / 2, y + CELL - 4)
         }
@@ -216,7 +178,7 @@ export class WordleScene implements Scene {
         ctx.fillStyle = bg
         ctx.fillRect(x, y, kw, KH)
         ctx.fillStyle = '#ccccdd'
-        ctx.font = '8px "Press Start 2P"'
+        ctx.font = FONT_SM
         ctx.textAlign = 'center'
         ctx.fillText(key, x + kw / 2, y + KH - 2)
       }

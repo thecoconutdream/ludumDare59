@@ -3,6 +3,7 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
+import { FONT_SM } from '@game/data/ui'
 import { SpaceFlightScene } from '@game/scenes/SpaceFlightScene'
 
 interface IntroPhase {
@@ -128,14 +129,14 @@ export class IntroScene implements Scene {
 
     ctx.textAlign = 'left'
     ctx.fillStyle = '#ffffff'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     for (let i = 0; i < phase.lines.length; i++) {
       ctx.fillText(phase.lines[i], 16, boxY + 14 + i * 14)
     }
 
     if (phase.subLines) {
       ctx.fillStyle = '#aaaacc'
-      ctx.font = '8px "Press Start 2P"'
+      ctx.font = FONT_SM
       for (let i = 0; i < phase.subLines.length; i++) {
         ctx.fillText(phase.subLines[i], 16, boxY + 14 + phase.lines.length * 14 + 6 + i * 12)
       }
@@ -144,7 +145,7 @@ export class IntroScene implements Scene {
     // Progress dots
     ctx.textAlign = 'right'
     ctx.fillStyle = '#556677'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.fillText(`${this.phaseIndex + 1}/${this.phases.length} ESC`, GAME_WIDTH - 12, boxY + boxH - 4)
 
     ctx.restore()
@@ -189,7 +190,7 @@ export class IntroScene implements Scene {
     ctx.fillStyle = '#1a1a1a'
     ctx.fillRect(220, 20, 80, 60)
     ctx.fillStyle = '#ff8833'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.textAlign = 'left'
     ctx.fillText('MENU', 225, 32)
     ctx.fillStyle = '#888866'
@@ -216,7 +217,7 @@ export class IntroScene implements Scene {
     ctx.fillStyle = '#2a1a0a'
     ctx.fillRect(10, 50, 100, 70)
     ctx.fillStyle = '#ff6b35'
-    ctx.font = '8px "Press Start 2P"'
+    ctx.font = FONT_SM
     ctx.textAlign = 'center'
     ctx.fillText('COSMIC', 60, 76)
     ctx.fillText('PIZZA', 60, 87)
