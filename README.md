@@ -19,7 +19,7 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ## How to Play
 
-1. **Choose your breed** — Felinax (cat) or Caninus (dog)
+1. **Choose your breed** — nami (cat) or yumi (dog)
 2. **Pick up the order** at Cosmic Pizza Co.
 3. **Fly through space** — use arrow keys or WASD to thrust, dodge asteroids along the way
 4. **Follow the compass** in the top-right corner to find your delivery target

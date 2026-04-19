@@ -6,8 +6,8 @@ import { gameState, CharacterType } from '@game/data/GameState'
 import { IntroScene } from '@game/scenes/IntroScene'
 
 const CHARACTERS: Array<{ type: CharacterType; label: string; desc: string; color: string }> = [
-  { type: 'cat', label: 'FELINAX',  desc: 'Clever cat.\nSpeed bonus.', color: '#ff8844' },
-  { type: 'dog', label: 'CANINUS',  desc: 'Brave dog.\nShield bonus.', color: '#4488ff' },
+  { type: 'cat', label: 'nami',  desc: 'Clever cat.\nSpeed bonus.', color: '#ff8844' },
+  { type: 'dog', label: 'yumi',  desc: 'Brave dog.\nShield bonus.', color: '#4488ff' },
 ]
 
 export class CharacterSelectScene implements Scene {

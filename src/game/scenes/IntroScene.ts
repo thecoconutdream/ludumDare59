@@ -25,7 +25,7 @@ export class IntroScene implements Scene {
     private input: InputManager,
     private assets: AssetLoader,
   ) {
-    const name = gameState.character === 'cat' ? 'FELINAX' : 'CANINUS'
+    const name = gameState.character === 'cat' ? 'nami' : 'yumi'
     this.phases = [
       {
         duration: 2.5,
