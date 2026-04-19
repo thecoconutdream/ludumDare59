@@ -11,6 +11,14 @@ const INITIAL_STATS = {
   brakeDeceleration: 32
 }
 
+interface Particle {
+  pos: Vector2
+  vel: Vector2
+  lifetime: number
+  maxLifetime: number
+  color: string
+}
+
 export class Ship {
   pos = Vector2.zero()
   vel = Vector2.zero()
@@ -20,6 +28,9 @@ export class Ship {
   brakeDeceleration = INITIAL_STATS.brakeDeceleration;
 
   private isAccelerating = false
+  private particles: Particle[] = []
+  private ignitionColors = ['#ff6600', '#ff8822', '#ffaa44', '#ff4400']
+  private ignitionSpawnTimer = 0
 
   update(dt: number, input: InputManager, maxSpeed: number): void {
     if (input.isHeld('left'))  this.angle -= this.turnSpeed * dt
@@ -29,6 +40,7 @@ export class Ship {
     if (this.isAccelerating) {
       const forward = new Vector2(Math.cos(this.angle), Math.sin(this.angle))
       this.vel = this.vel.add(forward.scale(this.acceleration * dt))
+      this.spawnIgnitionParticles()
     }
 
     if (input.isHeld('down')) {
@@ -46,9 +58,66 @@ export class Ship {
     }
 
     this.pos = this.pos.add(this.vel.scale(dt))
+    this.updateParticles(dt)
+  }
+
+  private spawnIgnitionParticles(): void {
+    this.ignitionSpawnTimer += 1
+    if (this.ignitionSpawnTimer < 2) return
+    this.ignitionSpawnTimer = 0
+
+    // Spawn particle behind ship
+    const backward = new Vector2(Math.cos(this.angle + Math.PI), Math.sin(this.angle + Math.PI))
+    const spawnPos = this.pos.add(backward.scale(8))
+
+    // Spread angle for particle variation
+    const spreadAngle = (Math.random() - 0.5) * 0.6
+    const cos = Math.cos(spreadAngle)
+    const sin = Math.sin(spreadAngle)
+    const particleDir = new Vector2(
+      backward.x * cos - backward.y * sin,
+      backward.x * sin + backward.y * cos
+    )
+
+    this.particles.push({
+      pos: spawnPos,
+      vel: particleDir.scale(30 + Math.random() * 40),
+      lifetime: 0,
+      maxLifetime: 0.3 + Math.random() * 0.2,
+      color: this.ignitionColors[Math.floor(Math.random() * this.ignitionColors.length)]
+    })
+  }
+
+  private updateParticles(dt: number): void {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      const p = this.particles[i]
+      p.lifetime += dt
+      p.pos = p.pos.add(p.vel.scale(dt))
+
+      if (p.lifetime >= p.maxLifetime) {
+        this.particles.splice(i, 1)
+      }
+    }
+  }
+
+  private hexToRgba(hex: string, alpha: number): string {
+    const r = parseInt(hex.slice(1, 3), 16)
+    const g = parseInt(hex.slice(3, 5), 16)
+    const b = parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`
   }
 
   render(ctx: CanvasRenderingContext2D, camera: Camera): void {
+    // Render particles first (behind ship)
+    for (const p of this.particles) {
+      const s = camera.worldToScreen(p.pos)
+      const alpha = 1 - (p.lifetime / p.maxLifetime)
+      ctx.fillStyle = this.hexToRgba(p.color, alpha)
+      ctx.beginPath()
+      ctx.arc(s.x, s.y, 2, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
     const s = camera.worldToScreen(this.pos)
     ctx.save()
     ctx.translate(s.x, s.y)
@@ -84,5 +153,13 @@ export class Ship {
 
   get bounds(): AABB {
     return new AABB(this.pos.x - 8, this.pos.y - 5, 16, 10)
+  }
+
+  addIgnitionColor(color: string): void {
+    this.ignitionColors.push(color)
+  }
+
+  setIgnitionColors(colors: string[]): void {
+    this.ignitionColors = colors
   }
 }
