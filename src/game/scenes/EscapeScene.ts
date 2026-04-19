@@ -10,8 +10,9 @@ import { SpaceFlightScene } from '@game/scenes/SpaceFlightScene'
 import { GameOverScene } from '@game/scenes/GameOverScene'
 
 const ESCAPE_DISTANCE = 200
-const COUNTDOWN_START = 10
+const COUNTDOWN_START = 12
 const TURRET_COUNT = 4
+const GRACE_PERIOD = 2.5
 
 interface Turret {
   pos: Vector2
@@ -35,10 +36,11 @@ export class EscapeScene implements Scene {
   private hit = false
   private resultTimer = 0
   private screenShake = 0
+  private graceTimer = GRACE_PERIOD
 
   // Ship physics
-  private readonly THRUST = 200
-  private readonly DRAG = 0.88
+  private readonly THRUST = 260
+  private readonly DRAG = 0.98
 
   constructor(
     private scenes: SceneManager,
@@ -50,6 +52,7 @@ export class EscapeScene implements Scene {
     this.shipPos = new Vector2(0, 0)
     this.shipVel = new Vector2(0, 0)
     this.countdown = COUNTDOWN_START
+    this.graceTimer = GRACE_PERIOD
 
     // Place turrets around origin in a circle
     for (let i = 0; i < TURRET_COUNT; i++) {
@@ -57,7 +60,7 @@ export class EscapeScene implements Scene {
       this.turrets.push({
         pos: new Vector2(Math.cos(a) * 90, Math.sin(a) * 90),
         angle: 0,
-        fireTimer: 0.5 + i * 0.4,
+        fireTimer: GRACE_PERIOD + 0.5 + i * 0.4,
         fireInterval: 2.5,
       })
     }
@@ -79,6 +82,9 @@ export class EscapeScene implements Scene {
       }
       return
     }
+
+    // Grace period — turrets are shown but don't fire yet
+    if (this.graceTimer > 0) this.graceTimer -= dt
 
     // Countdown
     this.countdown = Math.max(0, this.countdown - dt)
@@ -104,6 +110,7 @@ export class EscapeScene implements Scene {
 
     // Turrets aim and fire
     const fiercer = this.countdown < 3
+    if (this.graceTimer > 0) return
     for (const t of this.turrets) {
       t.angle = t.pos.angleTo(this.shipPos)
       t.fireTimer -= dt
@@ -236,7 +243,12 @@ export class EscapeScene implements Scene {
 
     ctx.fillStyle = '#aaaacc'
     ctx.font = FONT_SM
-    ctx.fillText('ESCAPE NOW!', GAME_WIDTH / 2, 28)
+    if (this.graceTimer > 0) {
+      ctx.fillStyle = '#ffcc00'
+      ctx.fillText(`TURRETS ONLINE IN ${Math.ceil(this.graceTimer)}...`, GAME_WIDTH / 2, 28)
+    } else {
+      ctx.fillText('ESCAPE NOW!', GAME_WIDTH / 2, 28)
+    }
 
     if (this.escaped) {
       ctx.fillStyle = '#44ff88'
