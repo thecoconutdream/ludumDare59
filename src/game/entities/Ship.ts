@@ -1,9 +1,11 @@
 import { Camera } from '@engine/rendering/Camera'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AnimationPlayer } from '@engine/rendering/AnimationPlayer'
 import { Vector2 } from '@engine/physics/Vector2'
 import { AABB } from '@engine/physics/AABB'
 import { gameState } from '@game/data/GameState'
+import { PlayerAnims } from '@game/data/animations'
 
 const INITIAL_STATS = {
   angle: 0,
@@ -19,7 +21,6 @@ const ANCHOR_X = 32, ANCHOR_Y = 32
 // Player drawn at 50% scale (32×48 → 16×24)
 const PLAYER_W = 32, PLAYER_H = 48
 const PLAYER_SCALE = 0.5
-const PLAYER_FLY_FRAME = 8
 
 export class Ship {
   pos = Vector2.zero()
@@ -30,32 +31,46 @@ export class Ship {
   brakeDeceleration = INITIAL_STATS.brakeDeceleration
 
   private isAccelerating = false
+  private anim = new AnimationPlayer()
+  private state: 'fly' | 'hit' = 'fly'
+
+  constructor() {
+    this.anim.play(PlayerAnims.fly)
+  }
+
+  triggerHit(): void {
+    this.state = 'hit'
+    this.anim.play(PlayerAnims.hit)
+  }
 
   update(dt: number, input: InputManager, maxSpeed: number): void {
-    if (input.isHeld('left'))  this.angle -= this.turnSpeed * dt
-    if (input.isHeld('right')) this.angle += this.turnSpeed * dt
+    if (this.state === 'fly') {
+      if (input.isHeld('left'))  this.angle -= this.turnSpeed * dt
+      if (input.isHeld('right')) this.angle += this.turnSpeed * dt
 
-    this.isAccelerating = input.isHeld('up')
-    if (this.isAccelerating) {
-      const forward = new Vector2(Math.cos(this.angle), Math.sin(this.angle))
-      this.vel = this.vel.add(forward.scale(this.acceleration * dt))
-    }
+      this.isAccelerating = input.isHeld('up')
+      if (this.isAccelerating) {
+        const forward = new Vector2(Math.cos(this.angle), Math.sin(this.angle))
+        this.vel = this.vel.add(forward.scale(this.acceleration * dt))
+      }
 
-    if (input.isHeld('down')) {
-      const speed = this.vel.magnitude()
-      if (speed > 0.001) {
-        const brakeStep = this.brakeDeceleration * dt
-        this.vel = brakeStep >= speed
-          ? Vector2.zero()
-          : this.vel.add(this.vel.normalized().scale(-brakeStep))
+      if (input.isHeld('down')) {
+        const speed = this.vel.magnitude()
+        if (speed > 0.001) {
+          const brakeStep = this.brakeDeceleration * dt
+          this.vel = brakeStep >= speed
+            ? Vector2.zero()
+            : this.vel.add(this.vel.normalized().scale(-brakeStep))
+        }
+      }
+
+      if (this.vel.magnitude() > maxSpeed) {
+        this.vel = this.vel.normalized().scale(maxSpeed)
       }
     }
 
-    if (this.vel.magnitude() > maxSpeed) {
-      this.vel = this.vel.normalized().scale(maxSpeed)
-    }
-
     this.pos = this.pos.add(this.vel.scale(dt))
+    this.anim.update(dt)
   }
 
   render(ctx: CanvasRenderingContext2D, camera: Camera, assets: AssetLoader): void {
@@ -71,12 +86,12 @@ export class Ship {
     const dw = PLAYER_W * PLAYER_SCALE
     const dh = PLAYER_H * PLAYER_SCALE
     const dx = (ANCHOR_X - SHIP_W / 2) - dw / 2
-    const dy = (ANCHOR_Y - SHIP_H / 2) - dh / 2
-    ctx.drawImage(assets.getImage(charKey), PLAYER_FLY_FRAME * PLAYER_W, 0, PLAYER_W, PLAYER_H, dx, dy, dw, dh)
+    const dy = (ANCHOR_Y - SHIP_H / 2) - dh + 4
+    ctx.drawImage(assets.getImage(charKey), this.anim.currentFrame * PLAYER_W, 0, PLAYER_W, PLAYER_H, dx, dy, dw, dh)
 
     ctx.restore()
 
-    if (this.isAccelerating && Math.random() > 0.4) {
+    if (this.state === 'fly' && this.isAccelerating && Math.random() > 0.4) {
       ctx.save()
       ctx.translate(s.x, s.y)
       ctx.rotate(this.angle)
