@@ -161,7 +161,7 @@ export class SpaceFlightScene implements Scene {
     for (const planet of this.planets) {
       if (planet.type === 'client') planet.renderProximityRing(ctx, this.camera, this.ship.pos)
     }
-    this.asteroids.render(ctx, this.camera)
+    this.asteroids.render(ctx, this.camera, this.assets)
     this.pickups.render(ctx, this.camera)
     this.ship.render(ctx, this.camera)
 
