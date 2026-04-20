@@ -245,25 +245,23 @@ export class SidePlanetScene implements Scene {
     this.foundHat = null
 
     if (this.loot === 'empty') {
-      const pool = EMPTY_FLAVORS[this.biome]
-      this.flavorText = pool[Math.floor(Math.random() * pool.length)]
-      this.lootLabel = ''
+      this.grantRandomUpgrade()
       return
     }
 
     if (this.loot === 'cannon') {
-      gameState.upgrades.cannonLevel++
-      this.flavorText = CANNON_FLAVOR[this.biome]
-      this.lootLabel = 'cannon'
+      if (gameState.upgrades.cannonLevel > 0) {
+        this.grantRandomUpgrade()
+      } else {
+        gameState.upgrades.cannonLevel = 1
+        this.flavorText = CANNON_FLAVOR[this.biome]
+        this.lootLabel = 'cannon'
+      }
       return
     }
 
     if (this.loot === 'upgrade') {
-      const option = UPGRADE_OPTIONS[Math.floor(Math.random() * UPGRADE_OPTIONS.length)]
-      if (option.key === 'shield') gameState.upgrades.shield++
-      else gameState.upgrades.hyperdrive++
-      this.flavorText = option.flavor[this.biome]
-      this.lootLabel = option.key
+      this.grantRandomUpgrade()
       return
     }
 
@@ -275,9 +273,19 @@ export class SidePlanetScene implements Scene {
       gameState.activeOutfit = hat
       this.foundHat = hat
       this.flavorText = OUTFIT_BIOME_FLAVOR[this.biome]
+      this.lootLabel = 'outfit'
     } else {
-      this.flavorText = 'Your collection is complete. Very chic.'
+      this.grantRandomUpgrade()
+      return
     }
-    this.lootLabel = 'outfit'
+  }
+
+  private grantRandomUpgrade(): void {
+    const option = UPGRADE_OPTIONS[Math.floor(Math.random() * UPGRADE_OPTIONS.length)]
+    this.loot = 'upgrade'
+    if (option.key === 'shield') gameState.upgrades.shield++
+    else gameState.upgrades.hyperdrive++
+    this.flavorText = option.flavor[this.biome]
+    this.lootLabel = option.key
   }
 }

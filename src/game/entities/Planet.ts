@@ -95,7 +95,7 @@ export class Planet {
       clientPos = new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)
     }
     const biomes: Biome[] = ['ice', 'jungle', 'desert', 'lava']
-    const loots: Loot[] = ['outfit', 'cannon', 'upgrade', 'outfit', 'empty', 'empty']
+    const loots: Loot[] = ['outfit', 'cannon', 'upgrade', 'outfit', 'upgrade', 'outfit']
 
     const planets: Planet[] = [
       new Planet('home', Vector2.zero(), 'home', 30, PLANET_COLORS.home, 'COSMIC PIZZA', 0),
@@ -109,11 +109,14 @@ export class Planet {
       const perpAngle = angle + Math.PI / 2 + (rng(s + i * 77) > 0.5 ? 0 : Math.PI)
       const offset = 60 + rng(s + i * 200) * 80
       const biome = biomes[i % 4]
+      const baseLoot = loots[i % loots.length]
+      const loot = baseLoot === 'cannon' && gameState.upgrades.cannonLevel > 0 ? 'upgrade' : baseLoot
+
       planets.push(new Planet(
         `side_${i}`,
         base.add(new Vector2(Math.cos(perpAngle) * offset, Math.sin(perpAngle) * offset)),
         'side', 20, BIOME_COLORS[biome], biome.toUpperCase(), (i % 2) + 1,
-        biome, loots[i % 4],
+        biome, loot,
       ))
     }
 
