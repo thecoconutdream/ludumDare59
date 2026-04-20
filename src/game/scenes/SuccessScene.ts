@@ -37,7 +37,7 @@ export class SuccessScene implements Scene {
     }
 
     // Reset per-delivery upgrades, then pick next client
-    gameState.upgrades.hyperdrive = false
+    gameState.upgrades.hyperdrive = 0
     gameState.upgrades.thrusterDamaged = false
     gameState.pickNextClient()
     this.nextClientName = gameState.currentClient?.name ?? ''
