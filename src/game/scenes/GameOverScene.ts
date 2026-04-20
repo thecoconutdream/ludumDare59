@@ -51,10 +51,20 @@ export class GameOverScene implements Scene {
     ctx.fillText('You were hit.', GAME_WIDTH / 2, 94)
 
     ctx.fillStyle = '#ffcc00'
-    ctx.fillText(`Deliveries: ${gameState.deliveryCount}`, GAME_WIDTH / 2, 112)
+    ctx.textAlign = 'center'
+    const deliveryText = `x ${gameState.deliveryCount}`
+    const textW = ctx.measureText(deliveryText).width
+    const totalW = 8 + 4 + textW
+    const lineX = GAME_WIDTH / 2 - totalW / 2
+    if (this.assets.hasImage('pizza')) {
+      ctx.drawImage(this.assets.getImage('pizza'), 0, 0, 32, 48, lineX, 102, 8, 12)
+    }
+    ctx.textAlign = 'left'
+    ctx.fillText(deliveryText, lineX + 12, 112)
 
     if (Math.sin(this.blink * 3) > 0) {
       ctx.fillStyle = '#ffffff'
+      ctx.textAlign = 'center'
       ctx.fillText('PRESS ENTR', GAME_WIDTH / 2, 140)
     }
   }

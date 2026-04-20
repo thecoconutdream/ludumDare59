@@ -245,7 +245,7 @@ export class EscapeScene implements Scene {
       const dh = PLAYER_H * PLAYER_SCALE
       const dx = (ANCHOR_X - SHIP_W / 2) - dw / 2
       const dy = (ANCHOR_Y - SHIP_H / 2) - dh + 4
-      const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
+      const charKey = gameState.playerSpriteKey
       ctx.save()
       ctx.translate(s.x, s.y)
       ctx.rotate(angle)

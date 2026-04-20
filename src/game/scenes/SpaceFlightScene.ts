@@ -97,11 +97,16 @@ export class SpaceFlightScene implements Scene {
     this.camera.follow(this.ship.pos, 0.08)
 
     const thrusting = this.input.isHeld('up')
-    if (thrusting && !this.audio.isPlaying('thrust')) this.audio.play('thrust')
-    else if (!thrusting) this.audio.stop('thrust')
-
-    if (gameState.upgrades.hyperdrive && !this.audio.isPlaying('speed')) this.audio.play('speed')
-    else if (!gameState.upgrades.hyperdrive) this.audio.stop('speed')
+    if (thrusting && gameState.upgrades.hyperdrive) {
+      this.audio.stop('thrust')
+      if (!this.audio.isPlaying('speed')) this.audio.play('speed')
+    } else if (thrusting) {
+      this.audio.stop('speed')
+      if (!this.audio.isPlaying('thrust')) this.audio.play('thrust')
+    } else {
+      this.audio.stop('thrust')
+      this.audio.stop('speed')
+    }
 
     const spawnInterval = Math.max(1.2, 2.5 - gameState.deliveryCount * 0.1)
     this.asteroidTimer += dt
@@ -244,7 +249,31 @@ export class SpaceFlightScene implements Scene {
 
     ctx.textAlign = 'left'
     ctx.fillStyle = '#ffcc00'
-    ctx.fillText(`DELIVERY #${gameState.deliveryCount + 1}`, 4, 10)
+    if (this.assets.hasImage('pizza')) {
+      ctx.drawImage(this.assets.getImage('pizza'), 0, 0, 32, 48, 4, 2, 8, 12)
+      ctx.fillText(`#${gameState.deliveryCount + 1}`, 15, 12)
+    } else {
+      ctx.fillText(`DELIVERY #${gameState.deliveryCount + 1}`, 4, 10)
+    }
+
+    // Outfit icons — bottom-left, one per collected hat, active highlighted
+    if (gameState.unlockedOutfits.length > 0) {
+      const HAT_W = 14, HAT_H = 21, HAT_GAP = 4
+      const HAT_Y = GAME_HEIGHT - HAT_H - 4
+      let hatX = 4
+      for (const key of gameState.unlockedOutfits) {
+        const iconKey = `icon_${key}`
+        if (this.assets.hasImage(iconKey)) {
+          if (gameState.activeOutfit === key) {
+            ctx.strokeStyle = '#ffcc00'
+            ctx.lineWidth = 1
+            ctx.strokeRect(hatX - 2, HAT_Y - 2, HAT_W + 4, HAT_H + 4)
+          }
+          ctx.drawImage(this.assets.getImage(iconKey), 0, 0, 32, 48, hatX, HAT_Y, HAT_W, HAT_H)
+          hatX += HAT_W + HAT_GAP
+        }
+      }
+    }
 
     let iconX = 4
     const iconY = 22
@@ -276,7 +305,7 @@ export class SpaceFlightScene implements Scene {
   }
 
   private renderLives(ctx: CanvasRenderingContext2D): void {
-    const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
+    const charKey = gameState.playerSpriteKey
     const img = this.assets.getImage(charKey)
     const iconW = 10, iconH = 15
     const gap = 4

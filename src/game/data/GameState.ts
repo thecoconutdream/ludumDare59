@@ -5,12 +5,22 @@ export type Biome = 'ice' | 'jungle' | 'desert' | 'lava'
 export type Loot = 'outfit' | 'upgrade' | 'empty'
 export type UpgradeType = 'hyperdrive' | 'thruster_damaged' | 'shield' | 'nav_chip'
 
+export const OUTFIT_KEYS = ['cooking_hat', 'delivery_hat', 'space_hat'] as const
+export type OutfitKey = typeof OUTFIT_KEYS[number]
+
+export const OUTFIT_LABELS: Record<OutfitKey, string> = {
+  cooking_hat:  'Cooking Hat',
+  delivery_hat: 'Delivery Cap',
+  space_hat:    'Space Helmet',
+}
+
 class GameState {
   character: CharacterType = 'cat'
   deliveryCount = 0
   lives = 3
   gameSeed = Math.random() * 100000
   unlockedOutfits: string[] = []
+  activeOutfit: string | null = null
   visitedSidePlanets = new Set<string>()
   currentClient: Client | null = null
 
@@ -27,6 +37,11 @@ class GameState {
   clientVariant = 1
   escapedFromPos: { x: number; y: number } | null = null
 
+  get playerSpriteKey(): string {
+    const base = `player_${this.character}`
+    return this.activeOutfit ? `${base}_${this.activeOutfit}` : base
+  }
+
   pickNextClient(): void {
     const prev = this.currentClient
     const pool = CLIENTS.length > 1 ? CLIENTS.filter(c => c !== prev) : CLIENTS
@@ -37,6 +52,7 @@ class GameState {
     this.deliveryCount = 0
     this.lives = 3
     this.unlockedOutfits = []
+    this.activeOutfit = null
     this.visitedSidePlanets.clear()
     this.upgrades = { hyperdrive: false, thrusterDamaged: false, shield: false, navChip: false }
     this.pendingLoot = null

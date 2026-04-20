@@ -4,7 +4,7 @@ import { AssetLoader } from '@engine/assets/AssetLoader'
 import { AudioManager } from '@engine/audio/AudioManager'
 import { AnimationPlayer } from '@engine/rendering/AnimationPlayer'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
-import { gameState } from '@game/data/GameState'
+import { gameState, OUTFIT_LABELS } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
 import { PlayerAnims } from '@game/data/animations'
 import { SpaceFlightScene } from '@game/scenes/SpaceFlightScene'
@@ -90,9 +90,12 @@ export class PizzeriaExteriorScene implements Scene {
       PAD_X - SHIP_W / 2, GROUND_Y - SHIP_H,
     )
 
-    const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
+    const charKey = gameState.playerSpriteKey
     const frame = this.anim.currentFrame
-    const py = GROUND_Y - PLAYER_DH
+    const isWalking = PlayerAnims.walk.frames.includes(frame)
+    const dw = isWalking ? 24 : PLAYER_DW
+    const dh = isWalking ? 32 : PLAYER_DH
+    const py = GROUND_Y - dh
 
     ctx.save()
     if (!this.facingRight) {
@@ -101,16 +104,20 @@ export class PizzeriaExteriorScene implements Scene {
       ctx.drawImage(
         this.assets.getImage(charKey),
         frame * PLAYER_W, 0, PLAYER_W, PLAYER_H,
-        -PLAYER_DW / 2, py, PLAYER_DW, PLAYER_DH,
+        -dw / 2, py, dw, dh,
       )
     } else {
       ctx.drawImage(
         this.assets.getImage(charKey),
         frame * PLAYER_W, 0, PLAYER_W, PLAYER_H,
-        this.x - PLAYER_DW / 2, py, PLAYER_DW, PLAYER_DH,
+        this.x - dw / 2, py, dw, dh,
       )
     }
     ctx.restore()
+
+    if (gameState.unlockedOutfits.length > 0) {
+      this.renderOutfitTray(ctx)
+    }
 
     ctx.textAlign = 'center'
     ctx.font = FONT_SM
@@ -123,6 +130,54 @@ export class PizzeriaExteriorScene implements Scene {
     } else {
       ctx.fillStyle = '#aaaacc'
       ctx.fillText('\u2190  Walk to the pizzeria', GAME_WIDTH / 2, GAME_HEIGHT - 8)
+    }
+  }
+
+  private renderOutfitTray(ctx: CanvasRenderingContext2D): void {
+    // [no hat] + each unlocked hat, right-aligned at top
+    const options: Array<string | null> = [null, ...gameState.unlockedOutfits]
+    const SLOT = 18   // slot width = height (square)
+    const GAP = 2
+    const totalW = options.length * (SLOT + GAP) - GAP
+    const startX = GAME_WIDTH - 4 - totalW
+    const trayY = 4
+
+    for (let i = 0; i < options.length; i++) {
+      const key = options[i]
+      const x = startX + i * (SLOT + GAP)
+      const isActive = gameState.activeOutfit === key
+
+      ctx.fillStyle = '#111122'
+      ctx.fillRect(x, trayY, SLOT, SLOT)
+      ctx.strokeStyle = isActive ? '#ffcc00' : '#334455'
+      ctx.lineWidth = 1
+      ctx.strokeRect(x, trayY, SLOT, SLOT)
+
+      if (key === null) {
+        // "no hat" slot — draw a small X
+        ctx.fillStyle = isActive ? '#ffcc00' : '#556677'
+        ctx.font = FONT_SM
+        ctx.textAlign = 'center'
+        ctx.fillText('-', x + SLOT / 2, trayY + SLOT - 4)
+      } else {
+        const iconKey = `icon_${key}`
+        if (this.assets.hasImage(iconKey)) {
+          ctx.drawImage(this.assets.getImage(iconKey), 0, 0, 32, 48, x + 1, trayY + 1, SLOT - 2, SLOT - 2)
+        }
+      }
+    }
+
+    // E hint + active label
+    ctx.textAlign = 'right'
+    ctx.fillStyle = '#556677'
+    ctx.font = FONT_SM
+    ctx.fillText('[1] outfit', startX - 4, trayY + SLOT - 4)
+
+    if (gameState.activeOutfit) {
+      const label = OUTFIT_LABELS[gameState.activeOutfit as keyof typeof OUTFIT_LABELS] ?? gameState.activeOutfit
+      ctx.fillStyle = '#ffcc00'
+      ctx.textAlign = 'right'
+      ctx.fillText(label, GAME_WIDTH - 4, trayY + SLOT + 10)
     }
   }
 }

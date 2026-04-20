@@ -116,7 +116,7 @@ export class Ship extends GameObject {
 
     ctx.drawImage(this.assets.getImage('ship'), -SHIP_W / 2, -SHIP_H / 2)
 
-    const charKey = gameState.character === 'cat' ? 'player_cat' : 'player_dog'
+    const charKey = gameState.playerSpriteKey
     const dw = PLAYER_W * PLAYER_SCALE
     const dh = PLAYER_H * PLAYER_SCALE
     const dx = (ANCHOR_X - SHIP_W / 2) - dw / 2

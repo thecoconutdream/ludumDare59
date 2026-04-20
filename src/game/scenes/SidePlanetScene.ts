@@ -3,7 +3,7 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
-import { gameState, Biome, Loot } from '@game/data/GameState'
+import { gameState, Biome, Loot, OUTFIT_KEYS, OUTFIT_LABELS } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
 
 const BIOME_COLORS: Record<Biome, string> = {
@@ -20,27 +20,11 @@ const BIOME_LABELS: Record<Biome, string> = {
   lava:   'LAVA PLANET',
 }
 
-const OUTFIT_FLAVORS: Record<Biome, string[]> = {
-  ice: [
-    'A frozen hat. The owner left in a hurry.',
-    'Cryo-preserved boots. Wearable. Barely.',
-    'A jacket patch, still icy. Still stylish.',
-  ],
-  jungle: [
-    'A jacket, now mostly leaves. Very on-brand.',
-    'Boot clasps, vine-reclaimed. Yours now.',
-    'A hat, half-consumed by a plant. Chic.',
-  ],
-  desert: [
-    'Sun-bleached goggles. Very post-apocalyptic.',
-    'A bandana, sand-caked. Someone\'s adventure.',
-    'Desert boots, slightly crispy. Still wearable.',
-  ],
-  lava: [
-    'Heat-proof visor. Previous owner: escaped. Eventually.',
-    'Asbestos gloves. Vintage. Do not ask.',
-    'A chest piece, lava-cooled. Still intact.',
-  ],
+const OUTFIT_BIOME_FLAVOR: Record<Biome, string> = {
+  ice:    'Cryo-preserved. The previous owner left in a hurry.',
+  jungle: 'The jungle gave it up. Eventually.',
+  desert: 'Sun-bleached but intact. Someone\'s lucky day.',
+  lava:   'Lava-tempered. Now yours.',
 }
 
 const EMPTY_FLAVORS: Record<Biome, string[]> = {
@@ -95,6 +79,7 @@ export class SidePlanetScene implements Scene {
   private loot: Loot
   private lootLabel = ''
   private flavorText = ''
+  private foundHat: string | null = null
   private blink = 0
 
   constructor(
@@ -198,7 +183,10 @@ export class SidePlanetScene implements Scene {
 
     ctx.font = FONT_SM
     const flavorLines = this.wrapText(ctx, this.flavorText, INNER_W)
-    const BOX_H = 22 + 10 + flavorLines.length * 12 + 14
+    const hasIcon = this.loot === 'outfit' && this.foundHat !== null
+    const BOX_H = hasIcon
+      ? 22 + 28 + 14 + flavorLines.length * 12 + 14  // header + icon(24) + name + flavor + footer
+      : 22 + 10 + flavorLines.length * 12 + 14
 
     ctx.fillStyle = '#111122'
     ctx.fillRect(px, py, BOX_W, BOX_H)
@@ -221,8 +209,20 @@ export class SidePlanetScene implements Scene {
       ctx.fillText('SHIP UPGRADE!', cx, py + 14)
     }
 
-    ctx.fillStyle = '#aaaacc'
-    flavorLines.forEach((l, i) => ctx.fillText(l, cx, py + 28 + i * 12))
+    if (this.loot === 'outfit' && this.foundHat) {
+      const iconKey = `icon_${this.foundHat}`
+      if (this.assets.hasImage(iconKey)) {
+        ctx.drawImage(this.assets.getImage(iconKey), 0, 0, 32, 48, cx - 8, py + 22, 16, 24)
+      }
+      ctx.fillStyle = '#ffffff'
+      ctx.font = FONT_SM
+      ctx.fillText(OUTFIT_LABELS[this.foundHat as keyof typeof OUTFIT_LABELS] ?? this.foundHat, cx, py + 50)
+      ctx.fillStyle = '#aaaacc'
+      flavorLines.forEach((l, i) => ctx.fillText(l, cx, py + 62 + i * 12))
+    } else {
+      ctx.fillStyle = '#aaaacc'
+      flavorLines.forEach((l, i) => ctx.fillText(l, cx, py + 28 + i * 12))
+    }
 
     if (Math.sin(this.blink * 4) > 0) {
       ctx.fillStyle = '#aaaacc'
@@ -231,6 +231,8 @@ export class SidePlanetScene implements Scene {
   }
 
   private rollLoot(): void {
+    this.foundHat = null
+
     if (this.loot === 'empty') {
       const pool = EMPTY_FLAVORS[this.biome]
       this.flavorText = pool[Math.floor(Math.random() * pool.length)]
@@ -246,9 +248,17 @@ export class SidePlanetScene implements Scene {
       return
     }
 
-    // outfit
-    const pool = OUTFIT_FLAVORS[this.biome]
-    this.flavorText = pool[Math.floor(Math.random() * pool.length)]
+    // outfit: pick a hat not yet unlocked
+    const available = OUTFIT_KEYS.filter(k => !gameState.unlockedOutfits.includes(k))
+    if (available.length > 0) {
+      const hat = available[Math.floor(Math.random() * available.length)]
+      gameState.unlockedOutfits.push(hat)
+      gameState.activeOutfit = hat
+      this.foundHat = hat
+      this.flavorText = OUTFIT_BIOME_FLAVOR[this.biome]
+    } else {
+      this.flavorText = 'Your collection is complete. Very chic.'
+    }
     this.lootLabel = 'outfit'
   }
 }

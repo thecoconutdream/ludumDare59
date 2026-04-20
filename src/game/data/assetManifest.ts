@@ -29,54 +29,70 @@ export const assetManifest: AssetDef[] = [
     placeholderColor: C.character, label: 'DOG',
   },
 
-  // ─── Outfit Overlays — same grid as base character (32×48, 256×288) ───────
+  // ─── Characters with hats — same 544×48 spritesheet as base ─────────────
   {
-    key: 'outfit_hat_cap',
-    path: 'sprites/outfits/hat_delivery_cap.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'HAT:CAP',
+    key: 'player_cat_cooking_hat',
+    path: 'sprites/player/nami_cooking_hat.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
+    placeholderColor: C.character, label: 'CAT+COOK',
   },
   {
-    key: 'outfit_hat_helmet',
-    path: 'sprites/outfits/hat_space_helmet.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'HAT:HELM',
+    key: 'player_cat_delivery_hat',
+    path: 'sprites/player/nami_delivery_hat.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
+    placeholderColor: C.character, label: 'CAT+DEL',
   },
   {
-    key: 'outfit_hat_toque',
-    path: 'sprites/outfits/hat_chef_toque.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'HAT:CHEF',
+    key: 'player_cat_space_hat',
+    path: 'sprites/player/nami_space_hat.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
+    placeholderColor: C.character, label: 'CAT+SPC',
   },
   {
-    key: 'outfit_hat_cowboy',
-    path: 'sprites/outfits/hat_cowboy.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'HAT:COWB',
+    key: 'player_dog_cooking_hat',
+    path: 'sprites/player/yumi_cooking_hat.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
+    placeholderColor: C.character, label: 'DOG+COOK',
   },
   {
-    key: 'outfit_body_jacket',
-    path: 'sprites/outfits/body_delivery_jacket.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'BODY:JKT',
+    key: 'player_dog_delivery_hat',
+    path: 'sprites/player/yumi_delivery_hat.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
+    placeholderColor: C.character, label: 'DOG+DEL',
   },
   {
-    key: 'outfit_body_bomber',
-    path: 'sprites/outfits/body_bomber.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'BODY:BMB',
+    key: 'player_dog_space_hat',
+    path: 'sprites/player/yumi_space_hat.png',
+    width: 544, height: 48, frameWidth: 32, frameHeight: 48,
+    placeholderColor: C.character, label: 'DOG+SPC',
+  },
+
+  // ─── Hat icons (32×48 single-frame, for UI tray) ─────────────────────────
+  {
+    key: 'icon_cooking_hat',
+    path: 'sprites/upgrades/cooking_hat.png',
+    width: 32, height: 48,
+    placeholderColor: C.outfit, label: 'COOK HAT',
   },
   {
-    key: 'outfit_body_spacesuit',
-    path: 'sprites/outfits/body_spacesuit.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'BODY:SPC',
+    key: 'icon_delivery_hat',
+    path: 'sprites/upgrades/delivery_hat.png',
+    width: 32, height: 48,
+    placeholderColor: C.outfit, label: 'DEL HAT',
   },
   {
-    key: 'outfit_body_chef',
-    path: 'sprites/outfits/body_chef_coat.png',
-    width: 256, height: 288, frameWidth: 32, frameHeight: 48,
-    placeholderColor: C.outfit, label: 'BODY:CHF',
+    key: 'icon_space_hat',
+    path: 'sprites/upgrades/space_hat.png',
+    width: 32, height: 48,
+    placeholderColor: C.outfit, label: 'SPC HAT',
+  },
+
+  // ─── Pizza icon (HUD) ─────────────────────────────────────────────────────
+  {
+    key: 'pizza',
+    path: 'sprites/pizza.png',
+    width: 32, height: 48,
+    placeholderColor: '#ff6b35', label: 'PIZZA',
   },
 
   // ─── Spaceship ─────────────────────────────────────────────────────────────
@@ -461,12 +477,6 @@ export const assetManifest: AssetDef[] = [
     path: 'sprites/ui/banner_escape.png',
     width: 100, height: 30,
     placeholderColor: '#cc3333', label: 'ESCAPE!',
-  },
-  {
-    key: 'ui_popup_outfit',
-    path: 'sprites/ui/popup_outfit.png',
-    width: 80, height: 50,
-    placeholderColor: '#ccaa00', label: 'NEW OUTFIT',
   },
   {
     key: 'ui_popup_upgrade',

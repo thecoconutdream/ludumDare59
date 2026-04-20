@@ -3,14 +3,9 @@ import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
 import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
-import { gameState } from '@game/data/GameState'
+import { gameState, OUTFIT_KEYS, OUTFIT_LABELS } from '@game/data/GameState'
 import { FONT_SM, FONT_LG } from '@game/data/ui'
 import { SpaceFlightScene } from '@game/scenes/SpaceFlightScene'
-
-const OUTFIT_NAMES = [
-  'Space Helmet', 'Bomber Jacket', 'Cowboy Hat',
-  'Chef Toque', 'Space Suit', 'Chef Coat',
-]
 
 export class SuccessScene implements Scene {
   private timer = 0
@@ -33,9 +28,9 @@ export class SuccessScene implements Scene {
     this.deliveredQuote = gameState.currentClient?.successQuote ?? '"Good job. I suppose."'
     gameState.deliveryCount++
 
-    const locked = OUTFIT_NAMES.filter(n => !gameState.unlockedOutfits.includes(n))
+    const locked = OUTFIT_KEYS.filter(k => !gameState.unlockedOutfits.includes(k))
     if (locked.length > 0) {
-      this.newOutfit = locked[0]
+      this.newOutfit = locked[Math.floor(Math.random() * locked.length)]
       gameState.unlockedOutfits.push(this.newOutfit)
     } else {
       this.newOutfit = null
@@ -147,9 +142,16 @@ export class SuccessScene implements Scene {
     if (this.newOutfit && this.timer > 2) {
       ctx.fillStyle = '#ffcc00'
       ctx.font = FONT_SM
-      ctx.fillText('NEW OUTFIT UNLOCKED!', cx, outfitY)
+      ctx.fillText('NEW HAT UNLOCKED!', cx, outfitY)
+      const iconKey = `icon_${this.newOutfit}`
+      if (this.assets.hasImage(iconKey)) {
+        ctx.drawImage(this.assets.getImage(iconKey), 0, 0, 32, 48, cx - 8, outfitY + 4, 16, 24)
+      }
       ctx.fillStyle = '#ffffff'
-      ctx.fillText(this.newOutfit, cx, outfitY + 14)
+      ctx.fillText(OUTFIT_LABELS[this.newOutfit as keyof typeof OUTFIT_LABELS] ?? this.newOutfit, cx, outfitY + 32)
+      ctx.fillStyle = '#aaaacc'
+      ctx.font = FONT_SM
+      ctx.fillText('Equip at the pizzeria [E]', cx, outfitY + 44)
     }
   }
 

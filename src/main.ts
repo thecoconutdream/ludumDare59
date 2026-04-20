@@ -6,6 +6,7 @@ import { AssetLoader } from '@engine/assets/AssetLoader'
 import { AudioManager } from '@engine/audio/AudioManager'
 import { MainMenuScene } from '@game/scenes/MainMenuScene'
 import { assetManifest } from '@game/data/assetManifest'
+import { gameState, OUTFIT_KEYS } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
 import '@game/data/debug'
 
@@ -42,6 +43,14 @@ audio.register('wordle_win',   { src: '/assets/sounds/wordle_win.wav' })
 audio.register('wordle_fail',  { src: '/assets/sounds/wordle_fail.wav' })
 audio.register('shield_hit',   { src: '/assets/sounds/shield_hit.wav' })
 audio.register('game_over',    { src: '/assets/sounds/gameover.mp3' })
+
+window.addEventListener('keydown', (e) => {
+  if (e.code === 'Digit1' && gameState.unlockedOutfits.length > 0) {
+    const options: Array<string | null> = [null, ...gameState.unlockedOutfits]
+    const idx = options.indexOf(gameState.activeOutfit)
+    gameState.activeOutfit = options[(idx + 1) % options.length]
+  }
+})
 
 async function boot() {
   await document.fonts.load(FONT_SM)
