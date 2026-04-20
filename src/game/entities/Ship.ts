@@ -64,7 +64,7 @@ export class Ship extends GameObject {
   activateHyperdrive(): void {
     const stacks = gameState.upgrades.hyperdrive
     this.acceleration = this.BASE_ACCELERATION * (2 + 0.3 * stacks)
-    this.brakeDeceleration = INITIAL_STATS.brakeDeceleration * (5 + stacks)
+    this.brakeDeceleration = INITIAL_STATS.brakeDeceleration * (5 + stacks * 3)
     this.igniter.activateHyperdrive()
   }
 

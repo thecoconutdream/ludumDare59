@@ -293,7 +293,15 @@ export class SpaceFlightScene implements Scene {
 
     ctx.textAlign = 'left'
     let iconY = 22
-    if (gameState.upgrades.hyperdrive)      { ctx.fillStyle = '#4488ff'; ctx.fillText(`BOOST${gameState.upgrades.hyperdrive > 1 ? ` x${gameState.upgrades.hyperdrive}` : ''}`, 4, iconY); iconY += 12 }
+    if (gameState.upgrades.hyperdrive) {
+      const spd = Math.round(gameState.maxSpeed)
+      const acc = Math.round(this.ship.acceleration)
+      const brk = Math.round(this.ship.brakeDeceleration)
+      ctx.fillStyle = '#4488ff'
+      ctx.fillText(`SPD ${spd}`, 4, iconY); iconY += 12
+      ctx.fillText(`ACC ${acc}`, 4, iconY); iconY += 12
+      ctx.fillText(`BRK ${brk}`, 4, iconY); iconY += 12
+    }
     if (gameState.upgrades.thrusterDamaged) { ctx.fillStyle = '#ff8800'; ctx.fillText('DMGD',  4, iconY); iconY += 12 }
     if (gameState.upgrades.shield > 0)      { ctx.fillStyle = '#44aaff'; ctx.fillText(`SH${gameState.upgrades.shield}/3`, 4, iconY); iconY += 12 }
     if (gameState.upgrades.navChip)         { ctx.fillStyle = '#44ff88'; ctx.fillText('NAV',   4, iconY) }
