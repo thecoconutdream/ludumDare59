@@ -25,8 +25,8 @@ export class ShipIgniter extends GameObject {
       spreadAngle: 0.6
     })
 
-    // Position emitter at rear of ship
-    const emitterAnchor: Anchor = { localPos: new Vector2(-SHIP_W / 2 - 4, 0) }
+    // Position emitter at rear of ship, y=6 matches flame rect center
+    const emitterAnchor: Anchor = { localPos: new Vector2(-SHIP_W / 2, 6) }
     this.addChild(this.particleEmitter, emitterAnchor)
   }
 
@@ -69,8 +69,8 @@ export class ShipIgniter extends GameObject {
       ctx.save()
       ctx.translate(s.x, s.y)
       ctx.rotate(this.angle)
-      ctx.fillStyle = '#ff6600'
-      ctx.fillRect(-SHIP_W / 2 - 8, 0, 8, 6)
+      ctx.fillStyle = this.ignitionColors[Math.floor(Math.random() * this.ignitionColors.length)]
+      ctx.fillRect(-SHIP_W / 2 - 4, 2, 8, 6)
       ctx.restore()
     }
   }
