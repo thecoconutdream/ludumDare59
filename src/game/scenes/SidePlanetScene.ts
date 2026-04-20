@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState, Biome, Loot } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
@@ -19,10 +20,71 @@ const BIOME_LABELS: Record<Biome, string> = {
   lava:   'LAVA PLANET',
 }
 
-const UPGRADE_NAMES: Record<string, string> = {
-  hyperdrive: 'Hyperdrive Boost',
-  shield:     'Energy Shield',
+const OUTFIT_FLAVORS: Record<Biome, string[]> = {
+  ice: [
+    'A frozen hat. The owner left in a hurry.',
+    'Cryo-preserved boots. Wearable. Barely.',
+    'A jacket patch, still icy. Still stylish.',
+  ],
+  jungle: [
+    'A jacket, now mostly leaves. Very on-brand.',
+    'Boot clasps, vine-reclaimed. Yours now.',
+    'A hat, half-consumed by a plant. Chic.',
+  ],
+  desert: [
+    'Sun-bleached goggles. Very post-apocalyptic.',
+    'A bandana, sand-caked. Someone\'s adventure.',
+    'Desert boots, slightly crispy. Still wearable.',
+  ],
+  lava: [
+    'Heat-proof visor. Previous owner: escaped. Eventually.',
+    'Asbestos gloves. Vintage. Do not ask.',
+    'A chest piece, lava-cooled. Still intact.',
+  ],
 }
+
+const EMPTY_FLAVORS: Record<Biome, string[]> = {
+  ice: [
+    'Nothing here. Just ice. And your regrets.',
+    'A sign: CLOSED FOR WINTER. Always winter here.',
+  ],
+  jungle: [
+    'Dense jungle. Three things tried to eat you.',
+    'Just trees. The trees are watching. Leave.',
+  ],
+  desert: [
+    'Sand everywhere. A cactus gives you a look.',
+    'Scorching. Desolate. The cactus waves goodbye.',
+  ],
+  lava: [
+    'Just lava. No loot. Only regret.',
+    'Molten rocks. A suspicious smell. Nothing useful.',
+  ],
+}
+
+const UPGRADE_OPTIONS: Array<{
+  key: 'hyperdrive' | 'shield'
+  flavor: Record<Biome, string>
+}> = [
+  {
+    key: 'hyperdrive',
+    flavor: {
+      ice:    'Hyperdrive chip, frosted. Specs say: should be fine.',
+      jungle: 'Hyperdrive chip, vine-wrapped. Fully charged somehow.',
+      desert: 'Hyperdrive chip, sand-blasted. Adds character.',
+      lava:   'Hyperdrive chip, slightly melted. Should be fine.',
+    },
+  },
+  {
+    key: 'shield',
+    flavor: {
+      ice:    'Shield emitter, ice-cold. Still emits. Barely.',
+      jungle: 'Shield emitter, overgrown. Works fine, somehow.',
+      desert: 'Shield emitter, sun-bleached. Still shields.',
+      lava:   'Shield emitter, lava-cooled. Surprisingly intact.',
+    },
+  },
+]
 
 type Phase = 'landing' | 'exploring' | 'loot' | 'done'
 
@@ -32,19 +94,22 @@ export class SidePlanetScene implements Scene {
   private biome: Biome
   private loot: Loot
   private lootLabel = ''
+  private flavorText = ''
   private blink = 0
 
   constructor(
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {
     this.biome = gameState.pendingBiome ?? 'ice'
     this.loot = gameState.pendingLoot ?? 'empty'
   }
 
   onEnter(): void {
-    this.lootLabel = this.rollLoot()
+    this.rollLoot()
+    if (!this.audio.isPlaying('music_space')) this.audio.play('music_space')
   }
 
   onExit(): void {}
@@ -57,7 +122,6 @@ export class SidePlanetScene implements Scene {
       if (this.phase === 'loot') {
         this.scenes.pop()
       } else {
-        // Skip straight to loot
         this.phase = 'loot'
         this.timer = 0
       }
@@ -71,6 +135,7 @@ export class SidePlanetScene implements Scene {
     if (this.phase === 'exploring' && this.timer > 0.8) {
       this.phase = 'loot'
       this.timer = 0
+      if (this.loot !== 'empty') this.audio.play('pickup')
     }
   }
 
@@ -85,7 +150,6 @@ export class SidePlanetScene implements Scene {
       ctx.fillRect(0, GAME_HEIGHT - 30, GAME_WIDTH, 30)
     }
 
-    // Biome label
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ffffff'
     ctx.font = FONT_SM
@@ -126,62 +190,65 @@ export class SidePlanetScene implements Scene {
   }
 
   private renderLootPopup(ctx: CanvasRenderingContext2D): void {
-    const BOX_W = 200
+    const BOX_W = 220
+    const INNER_W = BOX_W - 20
     const px = GAME_WIDTH / 2 - BOX_W / 2
-    const py = 55
+    const py = 50
+    const cx = GAME_WIDTH / 2
+
+    ctx.font = FONT_SM
+    const flavorLines = this.wrapText(ctx, this.flavorText, INNER_W)
+    const BOX_H = 22 + 10 + flavorLines.length * 12 + 14
 
     ctx.fillStyle = '#111122'
-    ctx.fillRect(px, py, BOX_W, 80)
-
-    ctx.strokeStyle = this.loot === 'empty' ? '#556677' : this.loot === 'outfit' ? '#ffcc00' : '#4488ff'
+    ctx.fillRect(px, py, BOX_W, BOX_H)
+    ctx.strokeStyle = this.loot === 'empty' ? '#556677'
+      : this.loot === 'outfit' ? '#ffcc00' : '#4488ff'
     ctx.lineWidth = 1
-    ctx.strokeRect(px, py, BOX_W, 80)
+    ctx.strokeRect(px, py, BOX_W, BOX_H)
 
     ctx.textAlign = 'center'
     ctx.font = FONT_SM
-    const cx = GAME_WIDTH / 2
-    const innerW = BOX_W - 16
 
     if (this.loot === 'empty') {
       ctx.fillStyle = '#556677'
-      ctx.fillText('Nothing here...', cx, py + 22)
-      ctx.fillStyle = '#aaaacc'
-      const lines = this.wrapText(ctx, '(Just a barren planet)', innerW)
-      lines.forEach((l, i) => ctx.fillText(l, cx, py + 34 + i * 12))
+      ctx.fillText('Nothing here.', cx, py + 14)
     } else if (this.loot === 'outfit') {
       ctx.fillStyle = '#ffcc00'
-      ctx.fillText('OUTFIT PIECE FOUND!', cx, py + 22)
-      ctx.fillStyle = '#ffffff'
-      this.wrapText(ctx, this.lootLabel, innerW).forEach((l, i) => ctx.fillText(l, cx, py + 36 + i * 12))
+      ctx.fillText('OUTFIT PIECE FOUND!', cx, py + 14)
     } else {
       ctx.fillStyle = '#4488ff'
-      ctx.fillText('SHIP UPGRADE!', cx, py + 22)
-      ctx.fillStyle = '#ffffff'
-      this.wrapText(ctx, this.lootLabel, innerW).forEach((l, i) => ctx.fillText(l, cx, py + 36 + i * 12))
+      ctx.fillText('SHIP UPGRADE!', cx, py + 14)
     }
+
+    ctx.fillStyle = '#aaaacc'
+    flavorLines.forEach((l, i) => ctx.fillText(l, cx, py + 28 + i * 12))
 
     if (Math.sin(this.blink * 4) > 0) {
       ctx.fillStyle = '#aaaacc'
-      ctx.fillText('PRESS ENTR to leave', cx, py + 68)
+      ctx.fillText('PRESS ENTR to leave', cx, py + BOX_H - 4)
     }
   }
 
-  private rollLoot(): string {
-    if (this.loot === 'empty') return ''
-
-    if (this.loot === 'upgrade') {
-      const upgrades = [
-        { key: 'hyperdrive', label: UPGRADE_NAMES['hyperdrive'] },
-        { key: 'shield',     label: UPGRADE_NAMES['shield'] },
-      ]
-      const picked = upgrades[Math.floor(Math.random() * upgrades.length)]
-      if (picked.key === 'hyperdrive') gameState.upgrades.hyperdrive = true
-      if (picked.key === 'shield') gameState.upgrades.shield = true
-      return picked.label
+  private rollLoot(): void {
+    if (this.loot === 'empty') {
+      const pool = EMPTY_FLAVORS[this.biome]
+      this.flavorText = pool[Math.floor(Math.random() * pool.length)]
+      this.lootLabel = ''
+      return
     }
 
-    // outfit: just a label for now, real unlock happens in SuccessScene
-    const pieces = ['Hat Fragment', 'Jacket Patch', 'Boot Clasp', 'Glove Shard']
-    return pieces[Math.floor(Math.random() * pieces.length)]
+    if (this.loot === 'upgrade') {
+      const option = UPGRADE_OPTIONS[Math.floor(Math.random() * UPGRADE_OPTIONS.length)]
+      gameState.upgrades[option.key] = true
+      this.flavorText = option.flavor[this.biome]
+      this.lootLabel = option.key
+      return
+    }
+
+    // outfit
+    const pool = OUTFIT_FLAVORS[this.biome]
+    this.flavorText = pool[Math.floor(Math.random() * pool.length)]
+    this.lootLabel = 'outfit'
   }
 }

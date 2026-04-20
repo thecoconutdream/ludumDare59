@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { Vector2 } from '@engine/physics/Vector2'
 import { FONT_SM, FONT_LG } from '@game/data/ui'
@@ -47,6 +48,7 @@ export class EscapeScene implements Scene {
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {}
 
   onEnter(): void {
@@ -54,6 +56,7 @@ export class EscapeScene implements Scene {
     this.shipVel = new Vector2(0, 0)
     this.countdown = COUNTDOWN_START
     this.graceTimer = GRACE_PERIOD
+    if (!this.audio.isPlaying('music_tense')) this.audio.play('music_tense')
 
     // Place turrets around origin in a circle
     for (let i = 0; i < TURRET_COUNT; i++) {
@@ -67,7 +70,9 @@ export class EscapeScene implements Scene {
     }
   }
 
-  onExit(): void {}
+  onExit(): void {
+    this.audio.stop('turret_alarm')
+  }
 
   update(dt: number): void {
     if (this.screenShake > 0) this.screenShake -= dt * 6
@@ -77,9 +82,9 @@ export class EscapeScene implements Scene {
       this.resultTimer += dt
       if (this.resultTimer > 1.5) {
         if (this.hit) {
-          this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets))
+          this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets, this.audio))
         } else {
-          this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets))
+          this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets, this.audio))
         }
       }
       return
@@ -90,6 +95,9 @@ export class EscapeScene implements Scene {
 
     // Countdown
     this.countdown = Math.max(0, this.countdown - dt)
+    const alarmActive = this.countdown < 3 && this.graceTimer <= 0
+    if (alarmActive && !this.audio.isPlaying('turret_alarm')) this.audio.play('turret_alarm')
+    else if (!alarmActive) this.audio.stop('turret_alarm')
 
     // Ship movement — locked during grace period
     const thrust = Vector2.zero()
@@ -125,6 +133,7 @@ export class EscapeScene implements Scene {
           pos: t.pos.clone(),
           vel: dir.scale(90),
         })
+        this.audio.play('laser')
       }
     }
 
@@ -145,16 +154,19 @@ export class EscapeScene implements Scene {
             gameState.upgrades.shield = false
             this.projectiles = this.projectiles.filter(q => q !== p)
             this.screenShake = 1
+            this.audio.play('shield_hit')
           } else {
             gameState.lives--
             if (gameState.lives <= 0) {
               this.hit = true
               this.resultTimer = 0
+              this.audio.play('hit')
               return
             }
             this.projectiles = this.projectiles.filter(q => q !== p)
             this.screenShake = 1
             this.invincibilityTimer = 2
+            this.audio.play('hit')
           }
           break
         }

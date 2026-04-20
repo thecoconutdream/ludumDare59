@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
@@ -23,8 +24,14 @@ export class IntroScene implements Scene {
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {
+    gameState.pickNextClient()
+    const client = gameState.currentClient!
     const name = gameState.character === 'cat' ? 'Nami' : 'Yumi'
+    const charLine = gameState.character === 'cat'
+      ? '"Try not to lick the box this time."'
+      : '"You are the BEST, ' + name + '! Now GO!"'
     this.phases = [
       {
         duration: 2.5,
@@ -35,14 +42,20 @@ export class IntroScene implements Scene {
       {
         duration: 3.5,
         bgKey: 'bg_pizzeria_interior',
-        lines: ['"Hot order incoming!"', `"${name}, you\'re up!"`],
-        subLines: ['Boss slides the slip across the counter.'],
+        lines: ['"Hot order incoming!"', `"${name}, you're up!"`],
+        subLines: [charLine],
       },
       {
-        duration: 2.5,
+        duration: 4,
         bgKey: 'bg_pizzeria_interior',
-        lines: ['"Wealthy client."', '"Don\'t mess this up."'],
-        subLines: ['You grab the pizza box. It\'s warm.'],
+        lines: ['NEW ORDER:', client.name],
+        subLines: [client.title, `"${client.order}"`, 'Destination: [SIGNAL ENCRYPTED]'],
+      },
+      {
+        duration: 3.5,
+        bgKey: 'bg_pizzeria_interior',
+        lines: ['"Crack the signal."', '"You know the drill."'],
+        subLines: [client.signal, '"Access code unlocks landing clearance."'],
       },
     ]
   }
@@ -50,6 +63,7 @@ export class IntroScene implements Scene {
   onEnter(): void {
     this.phaseIndex = 0
     this.phaseTimer = 0
+    if (!this.audio.isPlaying('music_menu')) this.audio.play('music_menu')
   }
 
   onExit(): void {}
@@ -61,6 +75,7 @@ export class IntroScene implements Scene {
     }
 
     if (this.input.isPressed('confirm')) {
+      this.audio.play('confirm')
       if (this.phaseIndex >= this.phases.length - 1) {
         this.launch()
       } else {
@@ -142,7 +157,7 @@ export class IntroScene implements Scene {
   }
 
   private launch(): void {
-    this.scenes.replace(new PizzeriaExteriorScene(this.scenes, this.input, this.assets, 'intro'))
+    this.scenes.replace(new PizzeriaExteriorScene(this.scenes, this.input, this.assets, this.audio, 'intro'))
   }
 
   private drawPizzeriaInterior(ctx: CanvasRenderingContext2D): void {

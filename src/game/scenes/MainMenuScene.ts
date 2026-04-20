@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { FONT_SM, FONT_LG } from '@game/data/ui'
 import { CharacterSelectScene } from '@game/scenes/CharacterSelectScene'
@@ -13,6 +14,7 @@ export class MainMenuScene implements Scene {
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {
     for (let i = 0; i < 60; i++) {
       this.stars.push({
@@ -23,13 +25,19 @@ export class MainMenuScene implements Scene {
     }
   }
 
-  onEnter(): void {}
+  onEnter(): void {
+    this.audio.stop('music_space')
+    this.audio.stop('music_tense')
+    if (!this.audio.isPlaying('music_menu')) this.audio.play('music_menu')
+  }
+
   onExit(): void {}
 
   update(dt: number): void {
     this.time += dt
     if (this.input.isPressed('confirm')) {
-      this.scenes.replace(new CharacterSelectScene(this.scenes, this.input, this.assets))
+      this.audio.play('confirm')
+      this.scenes.replace(new CharacterSelectScene(this.scenes, this.input, this.assets, this.audio))
     }
   }
 

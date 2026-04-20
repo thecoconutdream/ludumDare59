@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
 import { FONT_SM } from '@game/data/ui'
@@ -42,12 +43,15 @@ export class WordleScene implements Scene {
   private flashTimer = 0
   private result: 'playing' | 'won' | 'lost' = 'playing'
   private resultTimer = 0
+  private prePlay = true
+  private blinkTimer = 0
   private readonly kbHandler: (e: KeyboardEvent) => void
 
   constructor(
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {
     // Bind once so we can remove it on exit
     this.kbHandler = (e: KeyboardEvent) => this.handleKey(e.key)
@@ -55,7 +59,11 @@ export class WordleScene implements Scene {
 
   onEnter(): void {
     window.addEventListener('keydown', this.kbHandler)
-    this.currentAnswer = createRandomAnswer();
+    this.currentAnswer = createRandomAnswer()
+    this.prePlay = true
+    this.blinkTimer = 0
+    this.audio.stop('music_space')
+    if (!this.audio.isPlaying('music_tense')) this.audio.play('music_tense')
   }
 
   onExit(): void {
@@ -63,6 +71,16 @@ export class WordleScene implements Scene {
   }
 
   update(dt: number): void {
+    this.blinkTimer += dt
+
+    if (this.prePlay) {
+      if (this.input.isPressed('confirm')) {
+        this.audio.play('confirm')
+        this.prePlay = false
+      }
+      return
+    }
+
     if (this.shake > 0) this.shake = Math.max(0, this.shake - dt * 8)
     if (this.flashTimer > 0) this.flashTimer -= dt
 
@@ -70,9 +88,9 @@ export class WordleScene implements Scene {
       this.resultTimer += dt
       if (this.resultTimer > 2) {
         if (this.result === 'won') {
-          this.scenes.replace(new PizzeriaExteriorScene(this.scenes, this.input, this.assets, 'success'))
+          this.scenes.replace(new PizzeriaExteriorScene(this.scenes, this.input, this.assets, this.audio, 'success'))
         } else {
-          this.scenes.replace(new EscapeScene(this.scenes, this.input, this.assets))
+          this.scenes.replace(new EscapeScene(this.scenes, this.input, this.assets, this.audio))
         }
       }
     }
@@ -89,6 +107,11 @@ export class WordleScene implements Scene {
 
     ctx.fillStyle = '#000000aa'
     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT)
+
+    if (this.prePlay) {
+      this.renderPrePlay(ctx)
+      return
+    }
 
     ctx.textAlign = 'center'
     ctx.fillStyle = '#ffcc00'
@@ -208,6 +231,74 @@ export class WordleScene implements Scene {
     return states
   }
 
+  private wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
+    const words = text.split(' ')
+    const lines: string[] = []
+    let current = ''
+    for (const word of words) {
+      const test = current ? `${current} ${word}` : word
+      if (ctx.measureText(test).width > maxWidth && current) {
+        lines.push(current)
+        current = word
+      } else {
+        current = test
+      }
+    }
+    if (current) lines.push(current)
+    return lines
+  }
+
+  private renderPrePlay(ctx: CanvasRenderingContext2D): void {
+    const client = gameState.currentClient
+    const cx = GAME_WIDTH / 2
+    const BOX_X = 8, BOX_W = GAME_WIDTH - 16
+    const INNER_W = BOX_W - 20
+
+    ctx.font = FONT_SM
+    ctx.textAlign = 'center'
+
+    // Measure content to size the box
+    const titleLines = client ? this.wrapText(ctx, client.title, INNER_W) : []
+    const signalLines = client ? this.wrapText(ctx, client.signal, INNER_W) : []
+    const BOX_H = 18 + 14 + titleLines.length * 11 + 10 + signalLines.length * 11 + 16 + 14 + 14
+    const BOX_Y = Math.floor((GAME_HEIGHT - BOX_H) / 2) - 6
+
+    ctx.fillStyle = '#000000dd'
+    ctx.fillRect(BOX_X, BOX_Y, BOX_W, BOX_H)
+    ctx.strokeStyle = '#ff6b35'
+    ctx.lineWidth = 1
+    ctx.strokeRect(BOX_X, BOX_Y, BOX_W, BOX_H)
+
+    let y = BOX_Y + 12
+
+    ctx.fillStyle = '#ffcc00'
+    ctx.fillText('-- INCOMING SIGNAL --', cx, y)
+    y += 14
+
+    if (client) {
+      ctx.fillStyle = '#ffffff'
+      ctx.fillText(client.name, cx, y)
+      y += 12
+
+      ctx.fillStyle = '#aaaacc'
+      for (const line of titleLines) { ctx.fillText(line, cx, y); y += 11 }
+      y += 8
+
+      ctx.fillStyle = '#88aacc'
+      for (const line of signalLines) { ctx.fillText(line, cx, y); y += 11 }
+    }
+
+    y += 14
+    ctx.fillStyle = '#ff6b35'
+    ctx.fillText('Crack the code to land.', cx, y)
+    y += 12
+
+    if (Math.sin(this.blinkTimer * 4) > 0) {
+      ctx.fillStyle = '#556677'
+      ctx.fillText('PRESS ENTR to decrypt', cx, y)
+    }
+  }
+
   private handleKey(key: string): void {
     if (this.result !== 'playing') return
 
@@ -217,6 +308,7 @@ export class WordleScene implements Scene {
       this.submit()
     } else if (/^[A-Za-z]$/.test(key) && this.currentInput.length < WORD_LENGTH) {
       this.currentInput += key.toUpperCase()
+      this.audio.play('wordle_key')
     }
   }
 
@@ -235,9 +327,11 @@ export class WordleScene implements Scene {
     if (results.every(r => r.state === 'correct')) {
       this.result = 'won'
       this.resultTimer = 0
+      this.audio.play('wordle_win')
     } else if (this.guesses.length >= MAX_ATTEMPTS) {
       this.result = 'lost'
       this.resultTimer = 0
+      this.audio.play('wordle_fail')
     }
   }
 }

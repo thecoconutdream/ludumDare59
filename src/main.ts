@@ -3,6 +3,7 @@ import { SceneManager } from '@engine/core/SceneManager'
 import { GAME_HEIGHT, GAME_WIDTH, Renderer } from '@engine/rendering/Renderer'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { MainMenuScene } from '@game/scenes/MainMenuScene'
 import { assetManifest } from '@game/data/assetManifest'
 import { FONT_SM } from '@game/data/ui'
@@ -22,6 +23,25 @@ const input = new InputManager({
   land:    ['KeyE'],
 })
 const assets = new AssetLoader()
+
+const audio = new AudioManager()
+audio.register('music_menu',   { src: '/assets/sounds/music_menu.mp3',   loop: true,  volume: 0.5 })
+audio.register('music_space',  { src: '/assets/sounds/music_space.mp3',  loop: true,  volume: 0.5 })
+audio.register('music_tense',  { src: '/assets/sounds/music_tense.mp3',  loop: true,  volume: 0.5 })
+audio.register('thrust',       { src: '/assets/sounds/thrust.wav',       loop: true,  volume: 0.8 })
+audio.register('turret_alarm', { src: '/assets/sounds/turret_alarm.wav', loop: true,  volume: 0.9 })
+audio.register('speed',        { src: '/assets/sounds/speed.wav',        loop: true,  volume: 0.08 })
+audio.register('hit',          { src: '/assets/sounds/hit.wav' })
+audio.register('laser',        { src: '/assets/sounds/laser.wav' })
+audio.register('land',         { src: '/assets/sounds/land.wav' })
+audio.register('pickup',       { src: '/assets/sounds/pickup.wav' })
+audio.register('confirm',      { src: '/assets/sounds/confirm.wav' })
+audio.register('success',      { src: '/assets/sounds/success.wav' })
+audio.register('wordle_key',   { src: '/assets/sounds/wordle_key.wav' })
+audio.register('wordle_win',   { src: '/assets/sounds/wordle_win.wav' })
+audio.register('wordle_fail',  { src: '/assets/sounds/wordle_fail.wav' })
+audio.register('shield_hit',   { src: '/assets/sounds/shield_hit.wav' })
+audio.register('game_over',    { src: '/assets/sounds/gameover.mp3' })
 
 async function boot() {
   await document.fonts.load(FONT_SM)
@@ -45,7 +65,7 @@ async function boot() {
     ctx.fillRect(60, 95, barW, 6)
   })
 
-  scenes.push(new MainMenuScene(scenes, input, assets))
+  scenes.push(new MainMenuScene(scenes, input, assets, audio))
 
   const loop = new GameLoop(scenes, renderer, input)
   loop.start()

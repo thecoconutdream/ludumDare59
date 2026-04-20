@@ -1,3 +1,5 @@
+import { Client, CLIENTS } from '@game/data/clients'
+
 export type CharacterType = 'cat' | 'dog'
 export type Biome = 'ice' | 'jungle' | 'desert' | 'lava'
 export type Loot = 'outfit' | 'upgrade' | 'empty'
@@ -10,6 +12,7 @@ class GameState {
   gameSeed = Math.random() * 100000
   unlockedOutfits: string[] = []
   visitedSidePlanets = new Set<string>()
+  currentClient: Client | null = null
 
   upgrades = {
     hyperdrive: false,
@@ -24,6 +27,12 @@ class GameState {
   clientVariant = 1
   escapedFromPos: { x: number; y: number } | null = null
 
+  pickNextClient(): void {
+    const prev = this.currentClient
+    const pool = CLIENTS.length > 1 ? CLIENTS.filter(c => c !== prev) : CLIENTS
+    this.currentClient = pool[Math.floor(Math.random() * pool.length)]
+  }
+
   resetRun(): void {
     this.deliveryCount = 0
     this.lives = 3
@@ -35,6 +44,7 @@ class GameState {
     this.clientVariant = 1
     this.escapedFromPos = null
     this.gameSeed = Math.random() * 100000
+    this.currentClient = null
   }
 
   get maxSpeed(): number {

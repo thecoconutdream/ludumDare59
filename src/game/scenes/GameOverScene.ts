@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
 import { FONT_SM, FONT_LG } from '@game/data/ui'
@@ -12,18 +13,26 @@ export class GameOverScene implements Scene {
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {}
 
-  onEnter(): void {}
+  onEnter(): void {
+    this.audio.stop('music_menu')
+    this.audio.stop('music_space')
+    this.audio.stop('music_tense')
+    this.audio.play('game_over')
+  }
+
   onExit(): void {}
 
   update(dt: number): void {
     this.blink += dt
     if (this.input.isPressed('confirm')) {
+      this.audio.play('confirm')
       gameState.resetRun()
       // Lazy import breaks potential circular dep chain at instantiation time
       import('@game/scenes/CharacterSelectScene').then(({ CharacterSelectScene }) => {
-        this.scenes.replace(new CharacterSelectScene(this.scenes, this.input, this.assets))
+        this.scenes.replace(new CharacterSelectScene(this.scenes, this.input, this.assets, this.audio))
       })
     }
   }

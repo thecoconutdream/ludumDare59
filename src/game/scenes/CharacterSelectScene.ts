@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { SpriteSheet } from '@engine/rendering/SpriteSheet'
 import { gameState, CharacterType } from '@game/data/GameState'
@@ -8,8 +9,8 @@ import { FONT_SM } from '@game/data/ui'
 import { IntroScene } from '@game/scenes/IntroScene'
 
 const CHARACTERS: Array<{ type: CharacterType; label: string; desc: string; color: string }> = [
-  { type: 'cat', label: 'NAMI',  desc: 'Felinian\ncourier', color: '#ff8844' },
-  { type: 'dog', label: 'YUMI',  desc: 'Canisian\ncourier', color: '#4488ff' },
+  { type: 'cat', label: 'NAMI', desc: 'Felinian.\nUnbothered.\nDelivers.', color: '#ff8844' },
+  { type: 'dog', label: 'YUMI', desc: 'Canisian.\nGood Boy.\nBrings 110%.', color: '#4488ff' },
 ]
 
 export class CharacterSelectScene implements Scene {
@@ -20,20 +21,26 @@ export class CharacterSelectScene implements Scene {
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {}
 
-  onEnter(): void { this.selected = 0 }
+  onEnter(): void {
+    this.selected = 0
+    if (!this.audio.isPlaying('music_menu')) this.audio.play('music_menu')
+  }
+
   onExit(): void {}
 
   update(dt: number): void {
     this.blink += dt
 
-    if (this.input.isPressed('left'))  this.selected = 0
-    if (this.input.isPressed('right')) this.selected = 1
+    if (this.input.isPressed('left'))  { this.selected = 0; this.audio.play('confirm') }
+    if (this.input.isPressed('right')) { this.selected = 1; this.audio.play('confirm') }
 
     if (this.input.isPressed('confirm')) {
+      this.audio.play('confirm')
       gameState.character = CHARACTERS[this.selected].type
-      this.scenes.replace(new IntroScene(this.scenes, this.input, this.assets))
+      this.scenes.replace(new IntroScene(this.scenes, this.input, this.assets, this.audio))
     }
   }
 

@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { Camera } from '@engine/rendering/Camera'
 import { Vector2 } from '@engine/physics/Vector2'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
@@ -36,6 +37,7 @@ export class SpaceFlightScene implements Scene {
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
   ) {
     this.ship = new Ship(assets)
     this.starLayers = [new StarLayer(40, 1), new StarLayer(25, 2), new StarLayer(12, 3)]
@@ -44,6 +46,10 @@ export class SpaceFlightScene implements Scene {
   }
 
   onEnter(): void {
+    this.audio.stop('music_menu')
+    this.audio.stop('music_tense')
+    if (!this.audio.isPlaying('music_space')) this.audio.play('music_space')
+
     if (gameState.escapedFromPos) {
       this.ship.pos = new Vector2(gameState.escapedFromPos.x + 60, gameState.escapedFromPos.y)
       gameState.escapedFromPos = null
@@ -61,7 +67,10 @@ export class SpaceFlightScene implements Scene {
     if (gameState.upgrades.hyperdrive) this.ship.activateHyperdrive()
   }
 
-  onExit(): void {}
+  onExit(): void {
+    this.audio.stop('thrust')
+    this.audio.stop('speed')
+  }
 
   update(dt: number): void {
     if (this.screenShake > 0) this.screenShake = Math.max(0, this.screenShake - dt * 5)
@@ -75,7 +84,7 @@ export class SpaceFlightScene implements Scene {
       this.camera.follow(this.ship.pos, 0.08)
       if (this.hitTimer <= 0) {
         if (gameState.lives <= 0) {
-          this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets))
+          this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets, this.audio))
         } else {
           this.ship.resetState()
           this.invincibilityTimer = 2.5
@@ -86,6 +95,13 @@ export class SpaceFlightScene implements Scene {
 
     this.ship.tick(dt, this.input, gameState.maxSpeed)
     this.camera.follow(this.ship.pos, 0.08)
+
+    const thrusting = this.input.isHeld('up')
+    if (thrusting && !this.audio.isPlaying('thrust')) this.audio.play('thrust')
+    else if (!thrusting) this.audio.stop('thrust')
+
+    if (gameState.upgrades.hyperdrive && !this.audio.isPlaying('speed')) this.audio.play('speed')
+    else if (!gameState.upgrades.hyperdrive) this.audio.stop('speed')
 
     const spawnInterval = Math.max(1.2, 2.5 - gameState.deliveryCount * 0.1)
     this.asteroidTimer += dt
@@ -98,6 +114,7 @@ export class SpaceFlightScene implements Scene {
 
     const collected = this.pickups.checkCollection(this.ship.pos)
     if (collected) {
+      this.audio.play('pickup')
       this.pickups.remove(collected)
       if (collected.type === 'hyperdrive') {
         this.ship.activateHyperdrive()
@@ -114,11 +131,14 @@ export class SpaceFlightScene implements Scene {
         this.asteroids.remove(hit)
         this.ship.vel = this.ship.vel.normalized().scale(-50)
         this.screenShake = 1.2
+        this.audio.play('shield_hit')
       } else {
         gameState.lives--
         this.ship.triggerHit()
         this.screenShake = 1.5
         this.hitTimer = 0.9
+        this.audio.stop('thrust')
+        this.audio.play('hit')
       }
     }
 
@@ -133,14 +153,14 @@ export class SpaceFlightScene implements Scene {
     if (this.nearbyPlanet) {
       if (this.nearbyPlanet.type === 'home' && this.input.isPressed('confirm')) {
         this.failedDelivery = false
-        this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets))
+        this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets, this.audio))
         return
       }
       if (this.nearbyPlanet.type === 'client' && !this.failedDelivery && this.input.isPressed('confirm')) {
         const client = this.nearbyPlanet
         gameState.clientVariant = client.variant
         gameState.escapedFromPos = { x: client.pos.x, y: client.pos.y }
-        this.scenes.replace(new WordleScene(this.scenes, this.input, this.assets))
+        this.scenes.replace(new WordleScene(this.scenes, this.input, this.assets, this.audio))
       }
       if (this.nearbyPlanet.type === 'side' && this.input.isPressed('land') && this.interactionCooldown <= 0) {
         const planet = this.nearbyPlanet
@@ -149,7 +169,8 @@ export class SpaceFlightScene implements Scene {
           gameState.visitedSidePlanets.add(planet.id)
           gameState.pendingBiome = planet.biome ?? 'ice'
           gameState.pendingLoot = planet.loot ?? 'empty'
-          this.scenes.push(new SidePlanetScene(this.scenes, this.input, this.assets))
+          this.audio.play('land')
+          this.scenes.push(new SidePlanetScene(this.scenes, this.input, this.assets, this.audio))
         }
       }
     }

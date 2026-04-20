@@ -1,6 +1,7 @@
 import { Scene, SceneManager } from '@engine/core/SceneManager'
 import { InputManager } from '@engine/input/InputManager'
 import { AssetLoader } from '@engine/assets/AssetLoader'
+import { AudioManager } from '@engine/audio/AudioManager'
 import { AnimationPlayer } from '@engine/rendering/AnimationPlayer'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { gameState } from '@game/data/GameState'
@@ -27,6 +28,7 @@ export class PizzeriaExteriorScene implements Scene {
     private scenes: SceneManager,
     private input: InputManager,
     private assets: AssetLoader,
+    private audio: AudioManager,
     private mode: 'intro' | 'success',
   ) {
     this.x = mode === 'intro' ? DOOR_X : PAD_X
@@ -37,6 +39,8 @@ export class PizzeriaExteriorScene implements Scene {
     this.anim.play(PlayerAnims.idle)
     this.liftoff = false
     this.liftoffTimer = 0
+    if (this.mode === 'success') this.audio.stop('music_tense')
+    if (!this.audio.isPlaying('music_menu')) this.audio.play('music_menu')
   }
 
   onExit(): void {}
@@ -47,7 +51,7 @@ export class PizzeriaExteriorScene implements Scene {
     if (this.liftoff) {
       this.liftoffTimer += dt
       if (this.liftoffTimer > 0.8) {
-        this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets))
+        this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets, this.audio))
       }
       return
     }
@@ -66,7 +70,8 @@ export class PizzeriaExteriorScene implements Scene {
     }
 
     if (this.mode === 'success' && this.x <= DOOR_X + 15 && this.input.isPressed('confirm')) {
-      this.scenes.replace(new SuccessScene(this.scenes, this.input, this.assets))
+      this.audio.play('confirm')
+      this.scenes.replace(new SuccessScene(this.scenes, this.input, this.assets, this.audio))
     }
   }
 
