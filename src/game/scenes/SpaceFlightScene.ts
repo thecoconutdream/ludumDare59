@@ -33,7 +33,6 @@ export class SpaceFlightScene implements Scene {
   private hitTimer = 0
   private invincibilityTimer = 0
   private failedDelivery = false
-  private deliveredMode = false
 
   constructor(
     private scenes: SceneManager,
@@ -52,12 +51,7 @@ export class SpaceFlightScene implements Scene {
     this.audio.stop('music_tense')
     if (!this.audio.isPlaying('music_space')) this.audio.play('music_space')
 
-    if (gameState.escapedFromPos && gameState.deliveredSuccessfully) {
-      this.ship.pos = new Vector2(gameState.escapedFromPos.x + 60, gameState.escapedFromPos.y)
-      gameState.escapedFromPos = null
-      gameState.deliveredSuccessfully = false
-      this.deliveredMode = true
-    } else if (gameState.escapedFromPos) {
+    if (gameState.escapedFromPos) {
       this.ship.pos = new Vector2(gameState.escapedFromPos.x + 60, gameState.escapedFromPos.y)
       gameState.escapedFromPos = null
       this.failedDelivery = true
@@ -173,18 +167,17 @@ export class SpaceFlightScene implements Scene {
     for (const planet of this.planets) {
       const isHome = planet.type === 'home'
       if (planet.type === 'dead') continue
-      if (isHome && !this.failedDelivery && !this.deliveredMode) continue
+      if (isHome && !this.failedDelivery) continue
       if (planet.isNearby(this.ship.pos)) { this.nearbyPlanet = planet; break }
     }
 
     if (this.nearbyPlanet) {
       if (this.nearbyPlanet.type === 'home' && this.input.isPressed('confirm')) {
         this.failedDelivery = false
-        this.deliveredMode = false
         this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets, this.audio))
         return
       }
-      if (this.nearbyPlanet.type === 'client' && !this.failedDelivery && !this.deliveredMode && this.input.isPressed('confirm')) {
+      if (this.nearbyPlanet.type === 'client' && !this.failedDelivery && this.input.isPressed('confirm')) {
         const client = this.nearbyPlanet
         gameState.clientVariant = client.variant
         gameState.escapedFromPos = { x: client.pos.x, y: client.pos.y }
@@ -237,7 +230,7 @@ export class SpaceFlightScene implements Scene {
   }
 
   private renderHUD(ctx: CanvasRenderingContext2D): void {
-    const target = (this.failedDelivery || this.deliveredMode)
+    const target = this.failedDelivery
       ? this.planets.find(p => p.type === 'home')!
       : this.planets.find(p => p.type === 'client')!
     const dist = Math.floor(this.ship.pos.distanceTo(target.pos))
@@ -311,12 +304,9 @@ export class SpaceFlightScene implements Scene {
       if (this.nearbyPlanet.type === 'home') {
         ctx.fillStyle = '#44ff88'
         ctx.fillText('[ENTR] BACK TO PIZZERIA', GAME_WIDTH / 2, GAME_HEIGHT - 10)
-      } else if (this.nearbyPlanet.type === 'client' && !this.failedDelivery && !this.deliveredMode) {
+      } else if (this.nearbyPlanet.type === 'client' && !this.failedDelivery) {
         ctx.fillStyle = '#ffcc00'
         ctx.fillText('[ENTR] APPROACH', GAME_WIDTH / 2, GAME_HEIGHT - 10)
-      } else if (this.nearbyPlanet.type === 'client' && this.deliveredMode) {
-        ctx.fillStyle = '#44ff88'
-        ctx.fillText('DELIVERY DONE', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       } else if (this.nearbyPlanet.type === 'client' && this.failedDelivery) {
         ctx.fillStyle = '#ff4444'
         ctx.fillText('ACCESS DENIED', GAME_WIDTH / 2, GAME_HEIGHT - 10)
