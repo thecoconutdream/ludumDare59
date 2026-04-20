@@ -43,6 +43,8 @@ export class SpaceFlightScene implements Scene {
   private bullets: Bullet[] = []
   private shootCooldown = 0
   private bulletHue = 0
+  private pickupToastText = ''
+  private pickupToastTimer = 0
 
   constructor(
     private scenes: SceneManager,
@@ -95,6 +97,8 @@ export class SpaceFlightScene implements Scene {
   }
 
   update(dt: number): void {
+    if (this.pickupToastTimer > 0) this.pickupToastTimer = Math.max(0, this.pickupToastTimer - dt)
+
     if (debugSettings.pendingWarp === 'cannon') {
       const gunPlanet = this.planets.find(p => p.loot === 'cannon')
       if (gunPlanet) {
@@ -164,8 +168,10 @@ export class SpaceFlightScene implements Scene {
         if (collected.type === 'hyperdrive') {
           gameState.upgrades.hyperdrive++
           this.ship.activateHyperdrive()
+          this.showPickupToast('DRIVE UPGRADED')
         } else {
           gameState.upgrades.shield++
+          this.showPickupToast('SHIELD CHARGED')
         }
       }
     }
@@ -400,6 +406,21 @@ export class SpaceFlightScene implements Scene {
         ctx.fillText('(explored)', GAME_WIDTH / 2, GAME_HEIGHT - 10)
       }
     }
+
+    if (this.pickupToastTimer > 0) {
+      const alpha = Math.min(1, this.pickupToastTimer / 0.2)
+      ctx.save()
+      ctx.globalAlpha = alpha
+      ctx.textAlign = 'center'
+      ctx.fillStyle = '#ffe58a'
+      ctx.fillText(this.pickupToastText, GAME_WIDTH / 2, GAME_HEIGHT - 20)
+      ctx.restore()
+    }
+  }
+
+  private showPickupToast(text: string): void {
+    this.pickupToastText = text
+    this.pickupToastTimer = 1.2
   }
 
   private renderLives(ctx: CanvasRenderingContext2D): void {
