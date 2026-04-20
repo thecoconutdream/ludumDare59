@@ -125,14 +125,14 @@ export class SpaceFlightScene implements Scene {
     this.pickups.update(dt, this.ship.pos)
 
     this.shieldSpawnTimer += dt
-    if (this.shieldSpawnTimer >= 8) {
+    if (this.shieldSpawnTimer >= 6) {
       this.pickups.spawnShield(this.ship.pos)
       this.shieldSpawnTimer = 0
     }
 
     const collected = this.pickups.checkCollection(this.ship.pos)
     if (collected) {
-      const shieldFull = collected.type === 'shield' && gameState.upgrades.shield >= 2
+      const shieldFull = collected.type === 'shield' && gameState.upgrades.shield >= 3
       if (!shieldFull) {
         this.audio.play('pickup')
         this.pickups.remove(collected)
@@ -295,7 +295,7 @@ export class SpaceFlightScene implements Scene {
     const iconY = 22
     if (gameState.upgrades.hyperdrive)      { ctx.fillStyle = '#4488ff'; ctx.fillText('BOOST', iconX, iconY); iconX += 48 }
     if (gameState.upgrades.thrusterDamaged) { ctx.fillStyle = '#ff8800'; ctx.fillText('DMGD',  iconX, iconY); iconX += 40 }
-    if (gameState.upgrades.shield > 0)      { ctx.fillStyle = '#44aaff'; ctx.fillText(`SH${gameState.upgrades.shield}/2`, iconX, iconY); iconX += 40 }
+    if (gameState.upgrades.shield > 0)      { ctx.fillStyle = '#44aaff'; ctx.fillText(`SH${gameState.upgrades.shield}/3`, iconX, iconY); iconX += 40 }
     if (gameState.upgrades.navChip)         { ctx.fillStyle = '#44ff88'; ctx.fillText('NAV',   iconX, iconY) }
 
     if (this.nearbyPlanet) {

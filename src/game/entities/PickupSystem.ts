@@ -40,7 +40,7 @@ export class PickupSystem {
 
   spawnShield(near: Vector2): void {
     const angle = Math.random() * Math.PI * 2
-    const dist = 300 + Math.random() * 300
+    const dist = 100 + Math.random() * 300
     this.pickups.push({
       pos: near.add(new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)),
       type: 'shield',
