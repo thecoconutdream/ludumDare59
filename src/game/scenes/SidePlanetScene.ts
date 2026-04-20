@@ -242,7 +242,8 @@ export class SidePlanetScene implements Scene {
 
     if (this.loot === 'upgrade') {
       const option = UPGRADE_OPTIONS[Math.floor(Math.random() * UPGRADE_OPTIONS.length)]
-      gameState.upgrades[option.key] = true
+      if (option.key === 'shield') gameState.upgrades.shield++
+      else gameState.upgrades[option.key] = true
       this.flavorText = option.flavor[this.biome]
       this.lootLabel = option.key
       return

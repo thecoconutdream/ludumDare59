@@ -135,7 +135,7 @@ export class WordleScene implements Scene {
         ctx.fillStyle = '#44ff88'
         ctx.font = FONT_SM
         ctx.textAlign = 'center'
-        ctx.fillText('ACCESS GRANTED!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
+        ctx.fillText('DELIVERY DONE!', GAME_WIDTH / 2, GAME_HEIGHT / 2)
       } else {
         ctx.fillStyle = '#ff4444'
         ctx.font = FONT_SM

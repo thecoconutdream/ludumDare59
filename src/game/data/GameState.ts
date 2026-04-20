@@ -36,7 +36,6 @@ class GameState {
   pendingBiome: Biome | null = null
   clientVariant = 1
   escapedFromPos: { x: number; y: number } | null = null
-  deliveredSuccessfully = false
 
   get playerSpriteKey(): string {
     const base = `player_${this.character}`
@@ -60,7 +59,6 @@ class GameState {
     this.pendingBiome = null
     this.clientVariant = 1
     this.escapedFromPos = null
-    this.deliveredSuccessfully = false
     this.gameSeed = Math.random() * 100000
     this.currentClient = null
   }
