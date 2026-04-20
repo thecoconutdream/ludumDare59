@@ -325,11 +325,12 @@ export class SpaceFlightScene implements Scene {
     const img = this.assets.getImage(charKey)
     const iconW = 10, iconH = 15
     const gap = 4
-    const total = 3 * iconW + 2 * gap
+    const maxLives = 4
+    const total = maxLives * iconW + (maxLives - 1) * gap
     const startX = Math.floor(GAME_WIDTH / 2 - total / 2)
     const blink = this.invincibilityTimer > 0 && Math.floor(Date.now() / 120) % 2 === 0
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < maxLives; i++) {
       const x = startX + i * (iconW + gap)
       ctx.globalAlpha = i < gameState.lives ? (blink ? 0.3 : 1) : 0.2
       ctx.drawImage(img, 0, 0, 32, 48, x, 2, iconW, iconH)

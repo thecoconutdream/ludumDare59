@@ -298,9 +298,10 @@ export class EscapeScene implements Scene {
   private renderLives(ctx: CanvasRenderingContext2D): void {
     const blink = this.invincibilityTimer > 0 && Math.floor(Date.now() / 120) % 2 === 0
     const size = 6, gap = 4
-    const total = 3 * size + 2 * gap
+    const maxLives = 4
+    const total = maxLives * size + (maxLives - 1) * gap
     const startX = Math.floor(GAME_WIDTH / 2 - total / 2)
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < maxLives; i++) {
       const alive = i < gameState.lives
       ctx.fillStyle = alive ? (blink ? '#ff444488' : '#ff4444') : '#332222'
       ctx.fillRect(startX + i * (size + gap), 36, size, size)
