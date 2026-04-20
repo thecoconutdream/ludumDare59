@@ -11,22 +11,28 @@ export interface PickupData {
   pulseTimer: number
 }
 
-const COLLECT_RADIUS = 14
+const COLLECT_RADIUS = 20
 
 export class PickupSystem {
   private pickups: PickupData[] = []
 
-  populate(origin: Vector2, hyperdriveCount: number, shieldCount: number): void {
+  populate(origin: Vector2, hyperdriveCount: number, shieldCount: number, destination?: Vector2): void {
     const types: PickupType[] = [
       ...Array(hyperdriveCount).fill('hyperdrive'),
       ...Array(shieldCount).fill('shield'),
     ]
-    const total = types.length
-    for (let i = 0; i < total; i++) {
-      const angle = (i / total) * Math.PI * 2 + Math.random() * 0.5
-      const dist = 200 + Math.random() * 300
+    for (let i = types.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [types[i], types[j]] = [types[j], types[i]]
+    }
+    for (let i = 0; i < types.length; i++) {
+      const t = (i + 0.5 + (Math.random() - 0.5) * 0.6) / types.length
+      const base = destination ? origin.add(destination.sub(origin).scale(t)) : origin
+      const routeAngle = destination ? Math.atan2(destination.y - origin.y, destination.x - origin.x) : 0
+      const perpAngle = routeAngle + Math.PI / 2 * (Math.random() > 0.5 ? 1 : -1)
+      const spread = 80 + Math.random() * 150
       this.pickups.push({
-        pos: origin.add(new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)),
+        pos: base.add(new Vector2(Math.cos(perpAngle) * spread, Math.sin(perpAngle) * spread)),
         type: types[i],
         rotation: Math.random() * Math.PI * 2,
         pulseTimer: Math.random() * Math.PI * 2,
@@ -39,7 +45,7 @@ export class PickupSystem {
       p.rotation += dt * 1.2
       p.pulseTimer += dt * 3
     }
-    this.pickups = this.pickups.filter(p => p.pos.distanceTo(shipPos) < 900)
+    this.pickups = this.pickups.filter(p => p.pos.distanceTo(shipPos) < 2500)
   }
 
   spawnShield(near: Vector2): void {

@@ -272,7 +272,7 @@ export class EscapeScene implements Scene {
     ctx.fillStyle = '#aaaacc'
     ctx.font = FONT_SM
     if (this.graceTimer > 0) {
-      ctx.fillStyle = '#ffcc00'
+      ctx.fillStyle = '#ff2222'
       ctx.fillText(`TURRETS ONLINE IN ${Math.ceil(this.graceTimer)}...`, GAME_WIDTH / 2, 28)
     } else {
       ctx.fillText('ESCAPE NOW!', GAME_WIDTH / 2, 28)

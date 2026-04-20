@@ -70,18 +70,22 @@ export class SpaceFlightScene implements Scene {
       this.ship.pos = new Vector2(50, 0)
     }
     this.camera.position = this.ship.pos.clone()
-    this.asteroids.populate(this.ship.pos, 20)
-    this.asteroids.populateAroundHotspots(
-      this.planets.map(p => p.pos),
-      this.ship.pos,
-      250,
-      9,
-    )
-    this.pickups.populate(this.ship.pos, 4, 10)
+    this.applyUpgrades()
+    const clientPlanet = this.planets.find(p => p.type === 'client')
+    this.bullets = []
+    this.asteroids.clear()
+    this.asteroids.populateInBounds(this.planets.map(p => p.pos), this.ship.pos, 200, 120)
+    const orbitPlanets = this.planets.filter(p => p.type === 'client' || p.type === 'side')
+    this.asteroids.populateOrbiting(orbitPlanets.map(p => p.pos))
+    this.pickups.populate(this.ship.pos, 1, 3, clientPlanet?.pos)
   }
 
   onResume(): void {
     this.interactionCooldown = 0.4
+    this.applyUpgrades()
+  }
+
+  private applyUpgrades(): void {
     if (gameState.upgrades.hyperdrive) this.ship.activateHyperdrive()
   }
 
@@ -114,6 +118,7 @@ export class SpaceFlightScene implements Scene {
           this.scenes.replace(new GameOverScene(this.scenes, this.input, this.assets, this.audio))
         } else {
           this.ship.resetState()
+          this.applyUpgrades()
           this.invincibilityTimer = 2.5
         }
       }
@@ -145,7 +150,7 @@ export class SpaceFlightScene implements Scene {
     this.pickups.update(dt, this.ship.pos)
 
     this.shieldSpawnTimer += dt
-    if (this.shieldSpawnTimer >= 6) {
+    if (this.shieldSpawnTimer >= 18) {
       this.pickups.spawnShield(this.ship.pos)
       this.shieldSpawnTimer = 0
     }
