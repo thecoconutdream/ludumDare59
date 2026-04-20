@@ -32,7 +32,7 @@ export class AssetLoader {
           this.images.set(def.key, generatePlaceholder(def))
           resolve()
         }
-        img.src = `/assets/${def.path}`
+        img.src = `${import.meta.env.BASE_URL}assets/${def.path}`
       })
       this.pending.push(p)
     }
