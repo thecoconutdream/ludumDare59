@@ -17,7 +17,7 @@ export const OUTFIT_LABELS: Record<OutfitKey, string> = {
 class GameState {
   character: CharacterType = 'cat'
   deliveryCount = 0
-  lives = 3
+  lives = 4
   gameSeed = Math.random() * 100000
   unlockedOutfits: string[] = []
   activeOutfit: string | null = null
@@ -50,7 +50,7 @@ class GameState {
 
   resetRun(): void {
     this.deliveryCount = 0
-    this.lives = 3
+    this.lives = 4
     this.unlockedOutfits = []
     this.activeOutfit = null
     this.visitedSidePlanets.clear()
