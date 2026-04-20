@@ -5,6 +5,7 @@ import { AudioManager } from '@engine/audio/AudioManager'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 import { FONT_SM, FONT_LG } from '@game/data/ui'
 import { CharacterSelectScene } from '@game/scenes/CharacterSelectScene'
+import { HowToPlayScene } from '@game/scenes/HowToPlayScene'
 
 export class MainMenuScene implements Scene {
   private time = 0
@@ -38,6 +39,9 @@ export class MainMenuScene implements Scene {
     if (this.input.isPressed('confirm')) {
       this.audio.play('confirm')
       this.scenes.replace(new CharacterSelectScene(this.scenes, this.input, this.assets, this.audio))
+    }
+    if (this.input.isPressed('land')) {
+      this.scenes.push(new HowToPlayScene(this.scenes, this.input, this.assets, this.audio))
     }
   }
 
@@ -95,8 +99,11 @@ export class MainMenuScene implements Scene {
       ctx.fillText('PRESS ENTR', GAME_WIDTH / 2, 128)
     }
 
-    ctx.fillStyle = '#334455'
+    ctx.fillStyle = '#556677'
     ctx.font = FONT_SM
-    ctx.fillText('LUDUM DARE 59', GAME_WIDTH / 2, GAME_HEIGHT - 8)
+    ctx.fillText('[E] HOW TO PLAY', GAME_WIDTH / 2, GAME_HEIGHT - 18)
+
+    ctx.fillStyle = '#334455'
+    ctx.fillText('LUDUM DARE 59', GAME_WIDTH / 2, GAME_HEIGHT - 6)
   }
 }
