@@ -71,6 +71,7 @@ export class SuccessScene implements Scene {
         this.phase = 'neworder'
         this.timer = 0
       } else {
+        gameState.deliveredSuccessfully = true
         this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets, this.audio))
       }
       return
@@ -81,6 +82,7 @@ export class SuccessScene implements Scene {
       this.timer = 0
     }
     if (this.timer > 5 && this.phase === 'neworder') {
+      gameState.deliveredSuccessfully = true
       this.scenes.replace(new SpaceFlightScene(this.scenes, this.input, this.assets, this.audio))
     }
   }
