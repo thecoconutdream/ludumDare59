@@ -125,7 +125,7 @@ export class SpaceFlightScene implements Scene {
     this.pickups.update(dt, this.ship.pos)
 
     this.shieldSpawnTimer += dt
-    if (this.shieldSpawnTimer >= 20) {
+    if (this.shieldSpawnTimer >= 8) {
       this.pickups.spawnShield(this.ship.pos)
       this.shieldSpawnTimer = 0
     }
