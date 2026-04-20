@@ -19,9 +19,10 @@ const input = new InputManager({
   down:    ['ArrowDown',  'KeyS'],
   left:    ['ArrowLeft',  'KeyA'],
   right:   ['ArrowRight', 'KeyD'],
-  confirm: ['Enter',      'Space'],
+  confirm: ['Enter'],
   cancel:  ['Escape'],
   land:    ['KeyE'],
+  shoot:   ['Space'],
 })
 const assets = new AssetLoader()
 

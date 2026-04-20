@@ -17,6 +17,13 @@ import { SidePlanetScene } from '@game/scenes/SidePlanetScene'
 import { GameOverScene } from '@game/scenes/GameOverScene'
 import { debugSettings } from '@game/data/debug'
 
+interface Bullet {
+  pos: Vector2
+  vel: Vector2
+  hue: number
+  life: number
+}
+
 export class SpaceFlightScene implements Scene {
   private ship: Ship
   private camera = new Camera()
@@ -33,6 +40,9 @@ export class SpaceFlightScene implements Scene {
   private hitTimer = 0
   private invincibilityTimer = 0
   private failedDelivery = false
+  private bullets: Bullet[] = []
+  private shootCooldown = 0
+  private bulletHue = 0
 
   constructor(
     private scenes: SceneManager,
@@ -66,7 +76,7 @@ export class SpaceFlightScene implements Scene {
       250,
       9,
     )
-    this.pickups.populate(this.ship.pos, 4, 10)
+    this.pickups.populate(this.ship.pos, 4, 10, 4)
   }
 
   onResume(): void {
@@ -133,15 +143,49 @@ export class SpaceFlightScene implements Scene {
     const collected = this.pickups.checkCollection(this.ship.pos)
     if (collected) {
       const shieldFull = collected.type === 'shield' && gameState.upgrades.shield >= 3
-      if (!shieldFull) {
+      const cannonFull = collected.type === 'cannon' && gameState.upgrades.cannonLevel >= 4
+      if (!shieldFull && !cannonFull) {
         this.audio.play('pickup')
         this.pickups.remove(collected)
         if (collected.type === 'hyperdrive') {
-          this.ship.activateHyperdrive()
           gameState.upgrades.hyperdrive++
-        } else {
+          this.ship.activateHyperdrive()
+        } else if (collected.type === 'shield') {
           gameState.upgrades.shield++
+        } else {
+          gameState.upgrades.cannonLevel++
         }
+      }
+    }
+
+    if (this.shootCooldown > 0) this.shootCooldown -= dt
+    if (gameState.upgrades.cannonLevel > 0 && this.input.isPressed('shoot')) {
+      const cooldown = 1 + (4 - gameState.upgrades.cannonLevel) * (2 / 3)
+      if (this.shootCooldown <= 0) {
+        const dir = new Vector2(Math.cos(this.ship.angle), Math.sin(this.ship.angle))
+        this.bullets.push({
+          pos: this.ship.pos.clone(),
+          vel: dir.scale(300).add(this.ship.vel),
+          hue: this.bulletHue,
+          life: 2,
+        })
+        this.bulletHue = (this.bulletHue + 40) % 360
+        this.shootCooldown = cooldown
+        this.audio.play('laser')
+      }
+    }
+
+    for (const b of this.bullets) {
+      b.pos = b.pos.add(b.vel.scale(dt))
+      b.life -= dt
+    }
+    this.bullets = this.bullets.filter(b => b.life > 0)
+
+    for (const b of [...this.bullets]) {
+      const hit = this.asteroids.checkBulletHit(b.pos)
+      if (hit) {
+        this.asteroids.remove(hit)
+        this.bullets = this.bullets.filter(x => x !== b)
       }
     }
 
@@ -224,6 +268,18 @@ export class SpaceFlightScene implements Scene {
     this.asteroids.render(ctx, this.camera, this.assets)
     this.pickups.render(ctx, this.camera)
     this.ship.render(ctx, this.camera)
+    for (const b of this.bullets) {
+      const s = this.camera.worldToScreen(b.pos)
+      const offsets = [[-2, -1], [2, 0], [0, 2], [-1, 1]]
+      for (let i = 0; i < offsets.length; i++) {
+        const hue = (b.hue + i * 90) % 360
+        ctx.fillStyle = `hsl(${hue}, 100%, 65%)`
+        ctx.beginPath()
+        ctx.arc(s.x + offsets[i][0], s.y + offsets[i][1], 2, 0, Math.PI * 2)
+        ctx.fill()
+      }
+      b.hue = (b.hue + 25) % 360
+    }
 
     ctx.restore()
     this.renderHUD(ctx)
@@ -304,7 +360,13 @@ export class SpaceFlightScene implements Scene {
     }
     if (gameState.upgrades.thrusterDamaged) { ctx.fillStyle = '#ff8800'; ctx.fillText('DMGD',  4, iconY); iconY += 12 }
     if (gameState.upgrades.shield > 0)      { ctx.fillStyle = '#44aaff'; ctx.fillText(`SH${gameState.upgrades.shield}/3`, 4, iconY); iconY += 12 }
-    if (gameState.upgrades.navChip)         { ctx.fillStyle = '#44ff88'; ctx.fillText('NAV',   4, iconY) }
+    if (gameState.upgrades.navChip)         { ctx.fillStyle = '#44ff88'; ctx.fillText('NAV',   4, iconY); iconY += 12 }
+    if (gameState.upgrades.cannonLevel > 0) {
+      const ready = this.shootCooldown <= 0
+      const hue = (Date.now() / 10) % 360
+      ctx.fillStyle = ready ? `hsl(${hue}, 100%, 65%)` : '#556677'
+      ctx.fillText(ready ? `GUN RDY` : `GUN ${Math.ceil(this.shootCooldown)}s`, 4, iconY)
+    }
 
     if (this.nearbyPlanet) {
       const isVisited = this.nearbyPlanet.type === 'side' && this.visitedSides.has(this.nearbyPlanet.id)

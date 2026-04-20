@@ -101,6 +101,13 @@ export class AsteroidSystem {
     }
   }
 
+  checkBulletHit(pos: Vector2): AsteroidData | null {
+    for (const a of this.asteroids) {
+      if (pos.distanceTo(a.pos) < a.radius) return a
+    }
+    return null
+  }
+
   checkCollision(bounds: AABB): AsteroidData | null {
     const shipCenter = bounds.center
     const shipRadius = Math.min(bounds.width, bounds.height) / 2

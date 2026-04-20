@@ -54,6 +54,7 @@ export class HowToPlayScene implements Scene {
       ['E',          'LAND ON PLANET'],
       ['ENTER',      'CONFIRM / LAND'],
       ['ESC',        'SKIP CUTSCENE'],
+      ['SPACE',      'SHOOT RAINBOWS'],
       ['1',          'CHANGE OUTFIT'],
     ]
     let y = 39
@@ -80,13 +81,6 @@ export class HowToPlayScene implements Scene {
     ctx.fillStyle = '#556677'
     ctx.fillText('Normal stuff.', GAME_WIDTH / 2, y)
 
-    // ── Back prompt ───────────────────────────────────────────────────────────
-    if (Math.sin(this.pulse * 3) > 0) {
-      ctx.textAlign = 'center'
-      ctx.fillStyle = '#ffcc00'
-      ctx.font = FONT_SM
-      ctx.fillText('ENTR / ESC TO GO BACK', GAME_WIDTH / 2, GAME_HEIGHT - 6)
-    }
   }
 
   private sectionHeader(ctx: CanvasRenderingContext2D, text: string, y: number): void {

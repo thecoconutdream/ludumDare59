@@ -29,6 +29,7 @@ class GameState {
     thrusterDamaged: false,
     shield: 0,
     navChip: false,
+    cannonLevel: 0,
   }
 
   // Passed between scenes for context
@@ -54,7 +55,7 @@ class GameState {
     this.unlockedOutfits = []
     this.activeOutfit = null
     this.visitedSidePlanets.clear()
-    this.upgrades = { hyperdrive: 0, thrusterDamaged: false, shield: 0, navChip: false }
+    this.upgrades = { hyperdrive: 0, thrusterDamaged: false, shield: 0, navChip: false, cannonLevel: 0 }
     this.pendingLoot = null
     this.pendingBiome = null
     this.clientVariant = 1

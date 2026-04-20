@@ -2,7 +2,7 @@ import { Vector2 } from '@engine/physics/Vector2'
 import { Camera } from '@engine/rendering/Camera'
 import { GAME_WIDTH, GAME_HEIGHT } from '@engine/rendering/Renderer'
 
-export type PickupType = 'hyperdrive' | 'shield'
+export type PickupType = 'hyperdrive' | 'shield' | 'cannon'
 
 export interface PickupData {
   pos: Vector2
@@ -16,14 +16,19 @@ const COLLECT_RADIUS = 14
 export class PickupSystem {
   private pickups: PickupData[] = []
 
-  populate(origin: Vector2, hyperdriveCount: number, shieldCount: number): void {
-    const total = hyperdriveCount + shieldCount
+  populate(origin: Vector2, hyperdriveCount: number, shieldCount: number, cannonCount: number): void {
+    const types: PickupType[] = [
+      ...Array(hyperdriveCount).fill('hyperdrive'),
+      ...Array(shieldCount).fill('shield'),
+      ...Array(cannonCount).fill('cannon'),
+    ]
+    const total = types.length
     for (let i = 0; i < total; i++) {
       const angle = (i / total) * Math.PI * 2 + Math.random() * 0.5
       const dist = 200 + Math.random() * 300
       this.pickups.push({
         pos: origin.add(new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)),
-        type: i < hyperdriveCount ? 'hyperdrive' : 'shield',
+        type: types[i],
         rotation: Math.random() * Math.PI * 2,
         pulseTimer: Math.random() * Math.PI * 2,
       })
@@ -72,8 +77,10 @@ export class PickupSystem {
 
       if (p.type === 'hyperdrive') {
         this.renderHyperdrive(ctx, p.rotation, pulse)
-      } else {
+      } else if (p.type === 'shield') {
         this.renderShield(ctx, pulse)
+      } else {
+        this.renderCannon(ctx, p.pulseTimer, pulse)
       }
 
       ctx.restore()
@@ -108,6 +115,32 @@ export class PickupSystem {
     ctx.fillStyle = '#ffffff'
     ctx.beginPath()
     ctx.arc(0, 0, 2, 0, Math.PI * 2)
+    ctx.fill()
+  }
+
+  private renderCannon(ctx: CanvasRenderingContext2D, t: number, pulse: number): void {
+    ctx.globalAlpha = pulse * 0.3
+    ctx.strokeStyle = '#ff44ff'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.arc(0, 0, 10, 0, Math.PI * 2)
+    ctx.stroke()
+    ctx.globalAlpha = 1
+
+    const hue = (t * 60) % 360
+    ctx.fillStyle = `hsl(${hue}, 100%, 65%)`
+    const r = 5 * pulse
+    ctx.beginPath()
+    ctx.moveTo(r, 0)
+    ctx.lineTo(-r * 0.6, -r * 0.6)
+    ctx.lineTo(-r * 0.3, 0)
+    ctx.lineTo(-r * 0.6, r * 0.6)
+    ctx.closePath()
+    ctx.fill()
+
+    ctx.fillStyle = '#ffffff'
+    ctx.beginPath()
+    ctx.arc(0, 0, 1.5, 0, Math.PI * 2)
     ctx.fill()
   }
 
