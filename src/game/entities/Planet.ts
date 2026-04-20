@@ -95,7 +95,7 @@ export class Planet {
       clientPos = new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)
     }
     const biomes: Biome[] = ['ice', 'jungle', 'desert', 'lava']
-    const loots: Loot[] = ['outfit', 'upgrade', 'empty', 'outfit', 'empty', 'empty']
+    const loots: Loot[] = ['outfit', 'cannon', 'upgrade', 'outfit', 'empty', 'empty']
 
     const planets: Planet[] = [
       new Planet('home', Vector2.zero(), 'home', 30, PLANET_COLORS.home, 'COSMIC PIZZA', 0),

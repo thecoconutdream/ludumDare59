@@ -51,6 +51,7 @@ export class SpaceFlightScene implements Scene {
     private audio: AudioManager,
   ) {
     this.ship = new Ship(assets)
+    this.camera.zoom = 0.75
     this.starLayers = [new StarLayer(40, 1), new StarLayer(25, 2), new StarLayer(12, 3)]
     this.planets = Planet.generateRoute(gameState.deliveryCount)
     this.visitedSides = new Set(gameState.visitedSidePlanets)
@@ -76,7 +77,7 @@ export class SpaceFlightScene implements Scene {
       250,
       9,
     )
-    this.pickups.populate(this.ship.pos, 4, 10, 4)
+    this.pickups.populate(this.ship.pos, 4, 10)
   }
 
   onResume(): void {
@@ -90,6 +91,15 @@ export class SpaceFlightScene implements Scene {
   }
 
   update(dt: number): void {
+    if (debugSettings.pendingWarp === 'cannon') {
+      const gunPlanet = this.planets.find(p => p.loot === 'cannon')
+      if (gunPlanet) {
+        this.ship.pos = gunPlanet.pos.add(new Vector2(30, 0))
+        this.camera.position = this.ship.pos.clone()
+      }
+      debugSettings.pendingWarp = null
+    }
+
     if (this.screenShake > 0) this.screenShake = Math.max(0, this.screenShake - dt * 5)
     if (this.interactionCooldown > 0) this.interactionCooldown -= dt
 
@@ -143,17 +153,14 @@ export class SpaceFlightScene implements Scene {
     const collected = this.pickups.checkCollection(this.ship.pos)
     if (collected) {
       const shieldFull = collected.type === 'shield' && gameState.upgrades.shield >= 3
-      const cannonFull = collected.type === 'cannon' && gameState.upgrades.cannonLevel >= 4
-      if (!shieldFull && !cannonFull) {
+      if (!shieldFull) {
         this.audio.play('pickup')
         this.pickups.remove(collected)
         if (collected.type === 'hyperdrive') {
           gameState.upgrades.hyperdrive++
           this.ship.activateHyperdrive()
-        } else if (collected.type === 'shield') {
-          gameState.upgrades.shield++
         } else {
-          gameState.upgrades.cannonLevel++
+          gameState.upgrades.shield++
         }
       }
     }

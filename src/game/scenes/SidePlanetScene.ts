@@ -70,6 +70,13 @@ const UPGRADE_OPTIONS: Array<{
   },
 ]
 
+const CANNON_FLAVOR: Record<Biome, string> = {
+  ice:    'Rainbow cannon, cryogenically stored. Shoots first, asks later.',
+  jungle: 'Rainbow cannon, vine-entangled. Still fires. Loudly.',
+  desert: 'Rainbow cannon, sand-polished. Overcharged and ready.',
+  lava:   'Rainbow cannon, lava-forged. Handle with excitement.',
+}
+
 type Phase = 'landing' | 'exploring' | 'loot' | 'done'
 
 export class SidePlanetScene implements Scene {
@@ -191,7 +198,8 @@ export class SidePlanetScene implements Scene {
     ctx.fillStyle = '#111122'
     ctx.fillRect(px, py, BOX_W, BOX_H)
     ctx.strokeStyle = this.loot === 'empty' ? '#556677'
-      : this.loot === 'outfit' ? '#ffcc00' : '#4488ff'
+      : this.loot === 'outfit' ? '#ffcc00'
+      : this.loot === 'cannon' ? '#ff44ff' : '#4488ff'
     ctx.lineWidth = 1
     ctx.strokeRect(px, py, BOX_W, BOX_H)
 
@@ -204,6 +212,9 @@ export class SidePlanetScene implements Scene {
     } else if (this.loot === 'outfit') {
       ctx.fillStyle = '#ffcc00'
       ctx.fillText('OUTFIT PIECE FOUND!', cx, py + 14)
+    } else if (this.loot === 'cannon') {
+      ctx.fillStyle = '#ff44ff'
+      ctx.fillText('RAINBOW CANNON!', cx, py + 14)
     } else {
       ctx.fillStyle = '#4488ff'
       ctx.fillText('SHIP UPGRADE!', cx, py + 14)
@@ -240,10 +251,17 @@ export class SidePlanetScene implements Scene {
       return
     }
 
+    if (this.loot === 'cannon') {
+      gameState.upgrades.cannonLevel++
+      this.flavorText = CANNON_FLAVOR[this.biome]
+      this.lootLabel = 'cannon'
+      return
+    }
+
     if (this.loot === 'upgrade') {
       const option = UPGRADE_OPTIONS[Math.floor(Math.random() * UPGRADE_OPTIONS.length)]
       if (option.key === 'shield') gameState.upgrades.shield++
-      else gameState.upgrades[option.key] = true
+      else gameState.upgrades.hyperdrive++
       this.flavorText = option.flavor[this.biome]
       this.lootLabel = option.key
       return

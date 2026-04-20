@@ -2,7 +2,7 @@ import { Client, CLIENTS } from '@game/data/clients'
 
 export type CharacterType = 'cat' | 'dog'
 export type Biome = 'ice' | 'jungle' | 'desert' | 'lava'
-export type Loot = 'outfit' | 'upgrade' | 'empty'
+export type Loot = 'outfit' | 'upgrade' | 'cannon' | 'empty'
 export type UpgradeType = 'hyperdrive' | 'thruster_damaged' | 'shield' | 'nav_chip'
 
 export const OUTFIT_KEYS = ['cooking_hat', 'delivery_hat', 'space_hat'] as const
