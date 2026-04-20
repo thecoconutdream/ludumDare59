@@ -28,7 +28,9 @@ jobs:
         with:
           version: latest
       - run: pnpm install
-      - run: pnpm build
+      - run: pnpm build:pages
+        env:
+          BUILD_ID: ${{ github.sha }}
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
