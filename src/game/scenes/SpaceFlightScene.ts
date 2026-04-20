@@ -66,7 +66,7 @@ export class SpaceFlightScene implements Scene {
       250,
       9,
     )
-    this.pickups.populate(this.ship.pos, 2, 10)
+    this.pickups.populate(this.ship.pos, 4, 10)
   }
 
   onResume(): void {
@@ -138,7 +138,7 @@ export class SpaceFlightScene implements Scene {
         this.pickups.remove(collected)
         if (collected.type === 'hyperdrive') {
           this.ship.activateHyperdrive()
-          gameState.upgrades.hyperdrive = true
+          gameState.upgrades.hyperdrive++
         } else {
           gameState.upgrades.shield++
         }
@@ -291,12 +291,12 @@ export class SpaceFlightScene implements Scene {
       }
     }
 
-    let iconX = 4
-    const iconY = 22
-    if (gameState.upgrades.hyperdrive)      { ctx.fillStyle = '#4488ff'; ctx.fillText('BOOST', iconX, iconY); iconX += 48 }
-    if (gameState.upgrades.thrusterDamaged) { ctx.fillStyle = '#ff8800'; ctx.fillText('DMGD',  iconX, iconY); iconX += 40 }
-    if (gameState.upgrades.shield > 0)      { ctx.fillStyle = '#44aaff'; ctx.fillText(`SH${gameState.upgrades.shield}/3`, iconX, iconY); iconX += 40 }
-    if (gameState.upgrades.navChip)         { ctx.fillStyle = '#44ff88'; ctx.fillText('NAV',   iconX, iconY) }
+    ctx.textAlign = 'left'
+    let iconY = 22
+    if (gameState.upgrades.hyperdrive)      { ctx.fillStyle = '#4488ff'; ctx.fillText(`BOOST${gameState.upgrades.hyperdrive > 1 ? ` x${gameState.upgrades.hyperdrive}` : ''}`, 4, iconY); iconY += 12 }
+    if (gameState.upgrades.thrusterDamaged) { ctx.fillStyle = '#ff8800'; ctx.fillText('DMGD',  4, iconY); iconY += 12 }
+    if (gameState.upgrades.shield > 0)      { ctx.fillStyle = '#44aaff'; ctx.fillText(`SH${gameState.upgrades.shield}/3`, 4, iconY); iconY += 12 }
+    if (gameState.upgrades.navChip)         { ctx.fillStyle = '#44ff88'; ctx.fillText('NAV',   4, iconY) }
 
     if (this.nearbyPlanet) {
       const isVisited = this.nearbyPlanet.type === 'side' && this.visitedSides.has(this.nearbyPlanet.id)
