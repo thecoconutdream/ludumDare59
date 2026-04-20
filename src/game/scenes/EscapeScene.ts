@@ -64,7 +64,7 @@ export class EscapeScene implements Scene {
       this.turrets.push({
         pos: new Vector2(Math.cos(a) * 90, Math.sin(a) * 90),
         angle: 0,
-        fireTimer: GRACE_PERIOD + 0.5 + i * 0.4,
+        fireTimer: i * 0.15,
         fireInterval: 2.5,
       })
     }
@@ -150,8 +150,8 @@ export class EscapeScene implements Scene {
     if (this.invincibilityTimer <= 0) {
       for (const p of this.projectiles) {
         if (shipBounds.contains(p.pos)) {
-          if (gameState.upgrades.shield) {
-            gameState.upgrades.shield = false
+          if (gameState.upgrades.shield > 0) {
+            gameState.upgrades.shield--
             this.projectiles = this.projectiles.filter(q => q !== p)
             this.screenShake = 1
             this.audio.play('shield_hit')

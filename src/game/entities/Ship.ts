@@ -63,7 +63,7 @@ export class Ship extends GameObject {
 
   activateHyperdrive(): void {
     this.acceleration = this.BASE_ACCELERATION * 2.2
-    this.brakeDeceleration = INITIAL_STATS.brakeDeceleration * 2.5
+    this.brakeDeceleration = INITIAL_STATS.brakeDeceleration * 5
     this.igniter.activateHyperdrive()
   }
 
@@ -125,7 +125,7 @@ export class Ship extends GameObject {
 
     ctx.restore()
 
-    if (gameState.upgrades.shield) {
+    if (gameState.upgrades.shield > 0) {
       ctx.strokeStyle = `rgba(68,170,255,${0.4 + Math.sin(Date.now() / 200) * 0.2})`
       ctx.lineWidth = 1.5
       ctx.beginPath()

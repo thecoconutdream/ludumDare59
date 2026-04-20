@@ -64,6 +64,26 @@ export class AsteroidSystem {
     }
   }
 
+  populateAroundHotspots(hotspots: Vector2[], safeOrigin: Vector2, safeRadius: number, countPerHotspot: number): void {
+    for (const hotspot of hotspots) {
+      for (let i = 0; i < countPerHotspot; i++) {
+        const angle = Math.random() * Math.PI * 2
+        const dist = 55 + Math.random() * 140
+        const pos = hotspot.add(new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist))
+        if (pos.distanceTo(safeOrigin) < safeRadius) continue
+        const variantKey = VARIANT_POOL[Math.floor(Math.random() * VARIANT_POOL.length)]
+        this.asteroids.push({
+          pos,
+          vel: new Vector2((Math.random() - 0.5) * 28, (Math.random() - 0.5) * 28),
+          radius: VARIANT_RADII[variantKey],
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 2,
+          variantKey,
+        })
+      }
+    }
+  }
+
   spawn(shipPos: Vector2, shipAngle: number): void {
     const count = Math.random() < 0.4 ? 3 : 1
     for (let i = 0; i < count; i++) {

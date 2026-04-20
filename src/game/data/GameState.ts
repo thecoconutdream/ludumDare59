@@ -27,7 +27,7 @@ class GameState {
   upgrades = {
     hyperdrive: false,
     thrusterDamaged: false,
-    shield: false,
+    shield: 0,
     navChip: false,
   }
 
@@ -54,7 +54,7 @@ class GameState {
     this.unlockedOutfits = []
     this.activeOutfit = null
     this.visitedSidePlanets.clear()
-    this.upgrades = { hyperdrive: false, thrusterDamaged: false, shield: false, navChip: false }
+    this.upgrades = { hyperdrive: false, thrusterDamaged: false, shield: 0, navChip: false }
     this.pendingLoot = null
     this.pendingBiome = null
     this.clientVariant = 1
@@ -64,7 +64,7 @@ class GameState {
   }
 
   get maxSpeed(): number {
-    let speed = 120
+    let speed = 90
     if (this.upgrades.hyperdrive) speed *= 1.4
     if (this.upgrades.thrusterDamaged) speed *= 0.7
     return speed

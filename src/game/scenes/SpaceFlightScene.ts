@@ -25,6 +25,7 @@ export class SpaceFlightScene implements Scene {
   private asteroids = new AsteroidSystem()
   private pickups = new PickupSystem()
   private asteroidTimer = 0
+  private shieldSpawnTimer = 0
   private nearbyPlanet: Planet | null = null
   private visitedSides = new Set<string>()
   private screenShake = 0
@@ -58,8 +59,14 @@ export class SpaceFlightScene implements Scene {
       this.ship.pos = new Vector2(50, 0)
     }
     this.camera.position = this.ship.pos.clone()
-    this.asteroids.populate(this.ship.pos, 40)
-    this.pickups.populate(this.ship.pos, 3, 2)
+    this.asteroids.populate(this.ship.pos, 20)
+    this.asteroids.populateAroundHotspots(
+      this.planets.map(p => p.pos),
+      this.ship.pos,
+      250,
+      9,
+    )
+    this.pickups.populate(this.ship.pos, 2, 10)
   }
 
   onResume(): void {
@@ -117,22 +124,31 @@ export class SpaceFlightScene implements Scene {
     this.asteroids.update(dt, this.ship.pos)
     this.pickups.update(dt, this.ship.pos)
 
+    this.shieldSpawnTimer += dt
+    if (this.shieldSpawnTimer >= 20) {
+      this.pickups.spawnShield(this.ship.pos)
+      this.shieldSpawnTimer = 0
+    }
+
     const collected = this.pickups.checkCollection(this.ship.pos)
     if (collected) {
-      this.audio.play('pickup')
-      this.pickups.remove(collected)
-      if (collected.type === 'hyperdrive') {
-        this.ship.activateHyperdrive()
-        gameState.upgrades.hyperdrive = true
-      } else {
-        gameState.upgrades.shield = true
+      const shieldFull = collected.type === 'shield' && gameState.upgrades.shield >= 2
+      if (!shieldFull) {
+        this.audio.play('pickup')
+        this.pickups.remove(collected)
+        if (collected.type === 'hyperdrive') {
+          this.ship.activateHyperdrive()
+          gameState.upgrades.hyperdrive = true
+        } else {
+          gameState.upgrades.shield++
+        }
       }
     }
 
     const hit = this.invincibilityTimer <= 0 ? this.asteroids.checkCollision(this.ship.bounds) : null
     if (hit) {
-      if (gameState.upgrades.shield) {
-        gameState.upgrades.shield = false
+      if (gameState.upgrades.shield > 0) {
+        gameState.upgrades.shield--
         this.asteroids.remove(hit)
         this.ship.vel = this.ship.vel.normalized().scale(-50)
         this.screenShake = 1.2
@@ -279,7 +295,7 @@ export class SpaceFlightScene implements Scene {
     const iconY = 22
     if (gameState.upgrades.hyperdrive)      { ctx.fillStyle = '#4488ff'; ctx.fillText('BOOST', iconX, iconY); iconX += 36 }
     if (gameState.upgrades.thrusterDamaged) { ctx.fillStyle = '#ff8800'; ctx.fillText('DMGD',  iconX, iconY); iconX += 30 }
-    if (gameState.upgrades.shield)          { ctx.fillStyle = '#44aaff'; ctx.fillText('SHLD',  iconX, iconY); iconX += 30 }
+    if (gameState.upgrades.shield > 0)      { ctx.fillStyle = '#44aaff'; ctx.fillText(`SH ${gameState.upgrades.shield}/2`, iconX, iconY); iconX += 36 }
     if (gameState.upgrades.navChip)         { ctx.fillStyle = '#44ff88'; ctx.fillText('NAV',   iconX, iconY) }
 
     if (this.nearbyPlanet) {

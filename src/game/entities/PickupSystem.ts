@@ -38,6 +38,17 @@ export class PickupSystem {
     this.pickups = this.pickups.filter(p => p.pos.distanceTo(shipPos) < 900)
   }
 
+  spawnShield(near: Vector2): void {
+    const angle = Math.random() * Math.PI * 2
+    const dist = 300 + Math.random() * 300
+    this.pickups.push({
+      pos: near.add(new Vector2(Math.cos(angle) * dist, Math.sin(angle) * dist)),
+      type: 'shield',
+      rotation: Math.random() * Math.PI * 2,
+      pulseTimer: Math.random() * Math.PI * 2,
+    })
+  }
+
   checkCollection(shipPos: Vector2): PickupData | null {
     for (const p of this.pickups) {
       if (shipPos.distanceTo(p.pos) < COLLECT_RADIUS) return p
